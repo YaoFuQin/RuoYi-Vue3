@@ -4,18 +4,9 @@
     <el-dialog :title="title" v-model="open" width="800px" append-to-body @opened="modalOpened" @close="closeDialog">
       <el-row>
         <el-col :xs="24" :md="12" :style="{ height: '350px' }">
-          <vue-cropper
-            ref="cropper"
-            :img="options.img"
-            :info="true"
-            :autoCrop="options.autoCrop"
-            :autoCropWidth="options.autoCropWidth"
-            :autoCropHeight="options.autoCropHeight"
-            :fixedBox="options.fixedBox"
-            :outputType="options.outputType"
-            @realTime="realTime"
-            v-if="visible"
-          />
+          <vue-cropper ref="cropper" :img="options.img" :info="true" :autoCrop="options.autoCrop"
+            :autoCropWidth="options.autoCropWidth" :autoCropHeight="options.autoCropHeight" :fixedBox="options.fixedBox"
+            :outputType="options.outputType" @realTime="realTime" v-if="visible" />
         </el-col>
         <el-col :xs="24" :md="12" :style="{ height: '350px' }">
           <div class="avatar-upload-preview">
@@ -26,15 +17,12 @@
       <br />
       <el-row>
         <el-col :lg="2" :md="2">
-          <el-upload
-            action="#"
-            :http-request="requestUpload"
-            :show-file-list="false"
-            :before-upload="beforeUpload"
-          >
+          <el-upload action="#" :http-request="requestUpload" :show-file-list="false" :before-upload="beforeUpload">
             <el-button>
               选择
-              <el-icon class="el-icon--right"><Upload /></el-icon>
+              <el-icon class="el-icon--right">
+                <Upload />
+              </el-icon>
             </el-button>
           </el-upload>
         </el-col>
@@ -84,36 +72,36 @@ const options = reactive({
 })
 
 /** 编辑头像 */
-function editCropper() {
+function editCropper () {
   open.value = true
 }
 
 /** 打开弹出层结束时的回调 */
-function modalOpened() {
+function modalOpened () {
   visible.value = true
 }
 
 /** 覆盖默认上传行为 */
-function requestUpload() {}
+function requestUpload () { }
 
 /** 向左旋转 */
-function rotateLeft() {
+function rotateLeft () {
   proxy.$refs.cropper.rotateLeft()
 }
 
 /** 向右旋转 */
-function rotateRight() {
+function rotateRight () {
   proxy.$refs.cropper.rotateRight()
 }
 
 /** 图片缩放 */
-function changeScale(num) {
+function changeScale (num) {
   num = num || 1
   proxy.$refs.cropper.changeScale(num)
 }
 
 /** 上传预处理 */
-function beforeUpload(file) {
+function beforeUpload (file) {
   if (file.type.indexOf("image/") == -1) {
     proxy.$modal.msgError("文件格式错误，请上传图片类型,如：JPG，PNG后缀的文件。")
   } else {
@@ -127,7 +115,7 @@ function beforeUpload(file) {
 }
 
 /** 上传图片 */
-function uploadImg() {
+function uploadImg () {
   proxy.$refs.cropper.getCropBlob(data => {
     let formData = new FormData()
     formData.append("avatarfile", data, options.filename)
@@ -142,12 +130,12 @@ function uploadImg() {
 }
 
 /** 实时预览 */
-function realTime(data) {
+function realTime (data) {
   options.previews = data
 }
 
 /** 关闭窗口 */
-function closeDialog() {
+function closeDialog () {
   options.img = userStore.avatar
   options.visible = false
 }

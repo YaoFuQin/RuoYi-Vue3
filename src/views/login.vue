@@ -3,52 +3,40 @@
     <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">{{ title }}</h3>
       <el-form-item prop="username">
-        <el-input
-          v-model="loginForm.username"
-          type="text"
-          size="large"
-          auto-complete="off"
-          placeholder="账号"
-        >
+        <el-input v-model="loginForm.username" type="text" size="large" auto-complete="off" placeholder="账号">
           <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
         </el-input>
       </el-form-item>
       <el-form-item prop="password">
-        <el-input
-          v-model="loginForm.password"
-          type="password"
-          size="large"
-          auto-complete="off"
-          placeholder="密码"
-          @keyup.enter="handleLogin"
-        >
+        <el-input v-model="loginForm.password" type="password" size="large" auto-complete="off" placeholder="密码"
+          @keyup.enter="handleLogin">
           <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
         </el-input>
       </el-form-item>
+
+      <el-form-item prop="password">
+        <div style="display: flex;">
+          <el-input v-model.trim="loginForm.password" style="width: 230px" :placeholder="'请输入手机验证码'" type="text">
+          </el-input>
+          <el-button style="margin-left: 15px; width: 30%;" class="phone-code" :disabled="isGetPhone" type="primary"
+            @click="getPhoneCode">
+            {{ phoneCode }}
+          </el-button>
+        </div>
+      </el-form-item>
+
       <el-form-item prop="code" v-if="captchaEnabled">
-        <el-input
-          v-model="loginForm.code"
-          size="large"
-          auto-complete="off"
-          placeholder="验证码"
-          style="width: 63%"
-          @keyup.enter="handleLogin"
-        >
+        <el-input v-model="loginForm.code" size="large" auto-complete="off" placeholder="验证码" style="width: 63%"
+          @keyup.enter="handleLogin">
           <template #prefix><svg-icon icon-class="validCode" class="el-input__icon input-icon" /></template>
         </el-input>
         <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img"/>
+          <img :src="codeUrl" @click="getCode" class="login-code-img" />
         </div>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
       <el-form-item style="width:100%;">
-        <el-button
-          :loading="loading"
-          size="large"
-          type="primary"
-          style="width:100%;"
-          @click.prevent="handleLogin"
-        >
+        <el-button :loading="loading" size="large" type="primary" style="width:100%;" @click.prevent="handleLogin">
           <span v-if="!loading">登 录</span>
           <span v-else>登 录 中...</span>
         </el-button>
@@ -65,7 +53,7 @@
 </template>
 
 <script setup>
-import { getCodeImg } from "@/api/login"
+import { getCodeImg, getVerificationCode } from "@/api/login"
 import Cookies from "js-cookie"
 import { encrypt, decrypt } from "@/utils/jsencrypt"
 import useUserStore from '@/store/modules/user'
@@ -77,8 +65,8 @@ const router = useRouter()
 const { proxy } = getCurrentInstance()
 
 const loginForm = ref({
-  username: "admin",
-  password: "admin123",
+  username: "15888888888",
+  password: "666666",
   rememberMe: false,
   code: "",
   uuid: ""
@@ -92,6 +80,8 @@ const loginRules = {
 
 const codeUrl = ref("")
 const loading = ref(false)
+const isGetPhone = ref(false)
+const phoneCode = ref('获取验证码')
 // 验证码开关
 const captchaEnabled = ref(true)
 // 注册开关
@@ -99,10 +89,10 @@ const register = ref(false)
 const redirect = ref(undefined)
 
 watch(route, (newRoute) => {
-    redirect.value = newRoute.query && newRoute.query.redirect
+  redirect.value = newRoute.query && newRoute.query.redirect
 }, { immediate: true })
 
-function handleLogin() {
+function handleLogin () {
   proxy.$refs.loginRef.validate(valid => {
     if (valid) {
       loading.value = true
@@ -137,8 +127,34 @@ function handleLogin() {
     }
   })
 }
+function isPhone (value) {
+  const reg = /^1[3-9]\d{9}$/
+  return reg.test(value)
+}
 
-function getCode() {
+function getPhoneCode () {
+  if (!isPhone(loginForm.value.username)) {
+    proxy.$refs["loginForm"].validateField('username')
+    return
+  }
+  getVerificationCode({ username: loginForm.value.username }).then(() => {
+    isGetPhone.value = true
+    let n = 60
+    let timer
+    timer = setInterval(() => {
+      if (n > 0) {
+        n--
+        phoneCode.value = `${'获取验证码' + n}s`
+      } else {
+        clearInterval(timer)
+        phoneCode.value = '获取验证码'
+        isGetPhone.value = false
+      }
+    }, 1000)
+  })
+}
+
+function getCode () {
   getCodeImg().then(res => {
     captchaEnabled.value = res.captchaEnabled === undefined ? true : res.captchaEnabled
     if (captchaEnabled.value) {
@@ -148,7 +164,7 @@ function getCode() {
   })
 }
 
-function getCookie() {
+function getCookie () {
   const username = Cookies.get("username")
   const password = Cookies.get("password")
   const rememberMe = Cookies.get("rememberMe")
@@ -172,6 +188,7 @@ getCookie()
   background-image: url("../assets/images/login-background.jpg");
   background-size: cover;
 }
+
 .title {
   margin: 0px auto 30px auto;
   text-align: center;
@@ -184,32 +201,39 @@ getCookie()
   width: 400px;
   padding: 25px 25px 5px 25px;
   z-index: 1;
+
   .el-input {
     height: 40px;
+
     input {
       height: 40px;
     }
   }
+
   .input-icon {
     height: 39px;
     width: 14px;
     margin-left: 0px;
   }
 }
+
 .login-tip {
   font-size: 13px;
   text-align: center;
   color: #bfbfbf;
 }
+
 .login-code {
   width: 33%;
   height: 40px;
   float: right;
+
   img {
     cursor: pointer;
     vertical-align: middle;
   }
 }
+
 .el-login-footer {
   height: 40px;
   line-height: 40px;
@@ -222,6 +246,7 @@ getCookie()
   font-size: 12px;
   letter-spacing: 1px;
 }
+
 .login-code-img {
   height: 40px;
   padding-left: 12px;
