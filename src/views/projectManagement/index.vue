@@ -118,9 +118,18 @@ const data = reactive({
     projectType: undefined,
   },
   rules: {
-    postName: [{ required: true, message: "岗位名称不能为空", trigger: "blur" }],
-    postCode: [{ required: true, message: "岗位编码不能为空", trigger: "blur" }],
-    postSort: [{ required: true, message: "岗位顺序不能为空", trigger: "blur" }],
+    projectName: [
+      { required: true, message: "项目名称不能为空", trigger: "blur" }
+    ],
+    projectAddress: [
+      { required: true, message: "项目地址不能为空", trigger: "blur" }
+    ],
+    projectType: [
+      { required: true, message: "请选择项目类型", trigger: "change" }
+    ],
+    orderNum: [
+      { required: true, message: "项目顺序不能为空", trigger: "change" }
+    ]
   }
 })
 
@@ -217,8 +226,10 @@ function submitForm () {
 /** 删除按钮操作 */
 function handleDelete (row) {
   const delIds = row.id || ids.value
+  console.log(delIds, 222);
+
   proxy.$modal.confirm('是否确认删除岗位编号为"' + delIds + '"的数据项？').then(function () {
-    return delProjectManagement(ids)
+    return delProjectManagement(delIds)
   }).then(() => {
     getList()
     proxy.$modal.msgSuccess("删除成功")

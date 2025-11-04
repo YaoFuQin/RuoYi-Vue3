@@ -12,7 +12,7 @@
             <div class="head-container">
               <el-tree :data="categoryOptions" :props="{ label: 'categoryName', children: 'children' }"
                 :expand-on-click-node="false" :filter-node-method="filterNode" ref="deptTreeRef" node-key="categoryId"
-                highlight-current default-expand-all @node-click="handleNodeClick" />
+                highlight-current :default-expand-all="false" @node-click="handleNodeClick" />
             </div>
           </el-col>
         </pane>
@@ -339,9 +339,9 @@ function resetQuery () {
 
 /** 删除按钮操作 */
 function handleDelete (row) {
-  const productIds = row.productId || ids.value
-  proxy.$modal.confirm('是否确认删除产品编号为"' + productIds + '"的数据项？').then(function () {
-    return delCompanyProducts(productIds)
+  const delIds = row.id || ids.value
+  proxy.$modal.confirm('是否确认删除产品编号为"' + delIds + '"的数据项？').then(function () {
+    return delCompanyProducts(delIds)
   }).then(() => {
     getList()
     proxy.$modal.msgSuccess("删除成功")
@@ -359,7 +359,7 @@ function handleExport () {
 function handleStatusChange (row) {
   let text = row.status === "0" ? "启用" : "停用"
   proxy.$modal.confirm('确认要"' + text + '""' + row.userName + '"产品吗?').then(function () {
-    return changeUserStatus(row.productId, row.status)
+    return changeUserStatus(row.id, row.status)
   }).then(() => {
     proxy.$modal.msgSuccess(text + "成功")
   }).catch(function () {
@@ -383,8 +383,8 @@ function handleCommand (command, row) {
 
 /** 跳转角色分配 */
 function handleAuthRole (row) {
-  const productId = row.productId
-  router.push("/system/user-auth/role/" + productId)
+  const id = row.id
+  router.push("/system/user-auth/role/" + id)
 }
 
 /** 重置密码按钮操作 */
@@ -401,7 +401,7 @@ function handleResetPwd (row) {
       }
     },
   }).then(({ value }) => {
-    resetUserPwd(row.productId, value).then(response => {
+    resetUserPwd(row.id, value).then(response => {
       proxy.$modal.msgSuccess("修改成功，新密码是：" + value)
     })
   }).catch(() => { })
@@ -409,7 +409,7 @@ function handleResetPwd (row) {
 
 /** 选择条数  */
 function handleSelectionChange (selection) {
-  ids.value = selection.map(item => item.productId)
+  ids.value = selection.map(item => item.id)
   single.value = selection.length != 1
   multiple.value = !selection.length
 }
@@ -464,7 +464,7 @@ function submitFileForm () {
 /** 重置操作表单 */
 function reset () {
   form.value = {
-    productId: undefined,
+    id: undefined,
     name: undefined,
     iconUrl: undefined,
     categoryId: undefined,
@@ -490,8 +490,8 @@ function handleAdd () {
 /** 修改按钮操作 */
 function handleUpdate (row) {
   reset()
-  const productId = row.productId || ids.value
-  roleCompanyProducts(productId).then(response => {
+  const id = row.id || ids.value
+  roleCompanyProducts(id).then(response => {
     form.value = response.data
     open.value = true
     title.value = "修改产品"
@@ -502,7 +502,7 @@ function handleUpdate (row) {
 function submitForm () {
   proxy.$refs["userRef"].validate(valid => {
     if (valid) {
-      if (form.value.productId != undefined) {
+      if (form.value.id != undefined) {
         updateCompanyProducts(form.value).then(response => {
           proxy.$modal.msgSuccess("修改成功")
           open.value = false

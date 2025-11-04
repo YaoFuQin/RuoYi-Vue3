@@ -1,25 +1,13 @@
 <template>
   <div class="component-upload-image">
-    <el-upload
-      multiple
-      :disabled="disabled"
-      :action="uploadImgUrl"
-      list-type="picture-card"
-      :on-success="handleUploadSuccess"
-      :before-upload="handleBeforeUpload"
-      :data="data"
-      :limit="limit"
-      :on-error="handleUploadError"
-      :on-exceed="handleExceed"
-      ref="imageUpload"
-      :before-remove="handleDelete"
-      :show-file-list="true"
-      :headers="headers"
-      :file-list="fileList"
-      :on-preview="handlePictureCardPreview"
-      :class="{ hide: fileList.length >= limit }"
-    >
-      <el-icon class="avatar-uploader-icon"><plus /></el-icon>
+    <el-upload multiple :disabled="disabled" :action="uploadImgUrl" list-type="picture-card"
+      :on-success="handleUploadSuccess" :before-upload="handleBeforeUpload" :data="data" :limit="limit"
+      :on-error="handleUploadError" :on-exceed="handleExceed" ref="imageUpload" :before-remove="handleDelete"
+      :show-file-list="true" :headers="headers" :file-list="fileList" :on-preview="handlePictureCardPreview"
+      :class="{ hide: fileList.length >= limit }">
+      <el-icon class="avatar-uploader-icon">
+        <plus />
+      </el-icon>
     </el-upload>
     <!-- 上传提示 -->
     <div class="el-upload__tip" v-if="showTip && !disabled">
@@ -33,16 +21,8 @@
       的文件
     </div>
 
-    <el-dialog
-      v-model="dialogVisible"
-      title="预览"
-      width="800px"
-      append-to-body
-    >
-      <img
-        :src="dialogImageUrl"
-        style="display: block; max-width: 100%; margin: 0 auto"
-      />
+    <el-dialog v-model="dialogVisible" title="预览" width="800px" append-to-body>
+      <img :src="dialogImageUrl" style="display: block; max-width: 100%; margin: 0 auto" />
     </el-dialog>
   </div>
 </template>
@@ -128,10 +108,10 @@ watch(() => props.modelValue, val => {
     fileList.value = []
     return []
   }
-},{ deep: true, immediate: true })
+}, { deep: true, immediate: true })
 
 // 上传前loading加载
-function handleBeforeUpload(file) {
+function handleBeforeUpload (file) {
   let isImg = false
   if (props.fileType.length) {
     let fileExtension = ""
@@ -166,12 +146,12 @@ function handleBeforeUpload(file) {
 }
 
 // 文件个数超出
-function handleExceed() {
+function handleExceed () {
   proxy.$modal.msgError(`上传文件数量不能超过 ${props.limit} 个!`)
 }
 
 // 上传成功回调
-function handleUploadSuccess(res, file) {
+function handleUploadSuccess (res, file) {
   if (res.code === 200) {
     uploadList.value.push({ name: res.fileName, url: res.fileName })
     uploadedSuccessfully()
@@ -185,7 +165,7 @@ function handleUploadSuccess(res, file) {
 }
 
 // 删除图片
-function handleDelete(file) {
+function handleDelete (file) {
   const findex = fileList.value.map(f => f.name).indexOf(file.name)
   if (findex > -1 && uploadList.value.length === number.value) {
     fileList.value.splice(findex, 1)
@@ -195,7 +175,7 @@ function handleDelete(file) {
 }
 
 // 上传结束处理
-function uploadedSuccessfully() {
+function uploadedSuccessfully () {
   if (number.value > 0 && uploadList.value.length === number.value) {
     fileList.value = fileList.value.filter(f => f.url !== undefined).concat(uploadList.value)
     uploadList.value = []
@@ -206,19 +186,19 @@ function uploadedSuccessfully() {
 }
 
 // 上传失败
-function handleUploadError() {
+function handleUploadError () {
   proxy.$modal.msgError("上传图片失败")
   proxy.$modal.closeLoading()
 }
 
 // 预览
-function handlePictureCardPreview(file) {
+function handlePictureCardPreview (file) {
   dialogImageUrl.value = file.url
   dialogVisible.value = true
 }
 
 // 对象转成指定字符串分隔
-function listToString(list, separator) {
+function listToString (list, separator) {
   let strs = ""
   separator = separator || ","
   for (let i in list) {
@@ -249,10 +229,10 @@ onMounted(() => {
 <style scoped lang="scss">
 // .el-upload--picture-card 控制加号部分
 :deep(.hide .el-upload--picture-card) {
-    display: none;
+  display: none;
 }
 
 :deep(.el-upload.el-upload--picture-card.is-disabled) {
   display: none !important;
-} 
+}
 </style>

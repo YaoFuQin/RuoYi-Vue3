@@ -12,7 +12,7 @@
             <div class="head-container">
               <el-tree :data="categoryOptions" :props="{ label: 'categoryName', children: 'children' }"
                 :expand-on-click-node="false" :filter-node-method="filterNode" ref="deptTreeRef" node-key="categoryId"
-                highlight-current default-expand-all @node-click="handleNodeClick" />
+                highlight-current :default-expand-all="false" @node-click="handleNodeClick" />
             </div>
           </el-col>
         </pane>

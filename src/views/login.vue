@@ -3,16 +3,17 @@
     <el-form ref="loginRef" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">{{ title }}</h3>
       <el-form-item prop="username">
-        <el-input v-model="loginForm.username" type="text" size="large" auto-complete="off" placeholder="账号">
+        <el-input v-model="loginForm.username" type="text" size="large" auto-complete="off" placeholder="账号"
+          maxlength="11">
           <template #prefix><svg-icon icon-class="user" class="el-input__icon input-icon" /></template>
         </el-input>
       </el-form-item>
-      <el-form-item prop="password">
+      <!-- <el-form-item prop="password">
         <el-input v-model="loginForm.password" type="password" size="large" auto-complete="off" placeholder="密码"
           @keyup.enter="handleLogin">
           <template #prefix><svg-icon icon-class="password" class="el-input__icon input-icon" /></template>
         </el-input>
-      </el-form-item>
+      </el-form-item> -->
 
       <el-form-item prop="password">
         <div style="display: flex;">
@@ -34,7 +35,7 @@
           <img :src="codeUrl" @click="getCode" class="login-code-img" />
         </div>
       </el-form-item>
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <!-- <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox> -->
       <el-form-item style="width:100%;">
         <el-button :loading="loading" size="large" type="primary" style="width:100%;" @click.prevent="handleLogin">
           <span v-if="!loading">登 录</span>
