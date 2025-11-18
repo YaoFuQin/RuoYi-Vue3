@@ -127,42 +127,42 @@ const formConf = ref(formConfData)
 let oldActiveId
 let tempActiveData
 
-function activeFormItem(element) {
+function activeFormItem (element) {
   activeData.value = element
   activeId.value = element.formId
 }
-function copy() {
+function copy () {
   dialogVisible.value = true
   showFileName.value = false
   operationType.value = 'copy'
 }
-function download() {
+function download () {
   dialogVisible.value = true
   showFileName.value = true
   operationType.value = 'download'
 }
-function empty() {
+function empty () {
   proxy.$modal.confirm('确定要清空所有组件吗？', '提示', { type: 'warning' }).then(() => {
-      idGlobal.value = 100
-      drawingList.value = []
-    }
+    idGlobal.value = 100
+    drawingList.value = []
+  }
   )
 }
 
-function onEnd(obj, a) {
+function onEnd (obj, a) {
   if (obj.from !== obj.to) {
     activeData.value = tempActiveData
     activeId.value = idGlobal.value
   }
 }
 
-function addComponent(item) {
+function addComponent (item) {
   const clone = cloneComponent(item)
   drawingList.value.push(clone)
   activeFormItem(clone)
 }
 
-function cloneComponent(origin) {
+function cloneComponent (origin) {
   const clone = JSON.parse(JSON.stringify(origin))
   clone.formId = ++idGlobal.value
   clone.span = formConf.value.span
@@ -181,7 +181,7 @@ function cloneComponent(origin) {
   return tempActiveData
 }
 
-function drawingItemCopy(item, parent) {
+function drawingItemCopy (item, parent) {
   let clone = JSON.parse(JSON.stringify(item))
   clone = createIdAndKey(clone)
   parent.push(clone)
@@ -189,7 +189,7 @@ function drawingItemCopy(item, parent) {
 }
 
 
-function createIdAndKey(item) {
+function createIdAndKey (item) {
   item.formId = ++idGlobal.value
   item.renderKey = +new Date()
   if (item.layout === 'colFormItem') {
@@ -203,7 +203,7 @@ function createIdAndKey(item) {
   return item
 }
 
-function drawingItemDelete(index, parent) {
+function drawingItemDelete (index, parent) {
   parent.splice(index, 1)
   nextTick(() => {
     const len = drawingList.value.length
@@ -213,7 +213,7 @@ function drawingItemDelete(index, parent) {
   })
 }
 
-function tagChange(newTag) {
+function tagChange (newTag) {
   newTag = cloneComponent(newTag)
   newTag.vModel = activeData.value.vModel
   newTag.formId = activeId.value
@@ -232,7 +232,7 @@ function tagChange(newTag) {
 }
 
 
-function updateDrawingList(newTag, list) {
+function updateDrawingList (newTag, list) {
   const index = list.findIndex(item => item.formId === activeId.value)
   if (index > -1) {
     list.splice(index, 1, newTag)
@@ -242,7 +242,7 @@ function updateDrawingList(newTag, list) {
     })
   }
 }
-function generate(data) {
+function generate (data) {
   generateConf.value = data
   nextTick(() => {
     switch (operationType.value) {
@@ -258,19 +258,19 @@ function generate(data) {
   })
 }
 
-function execDownload(data) {
+function execDownload (data) {
   const codeStr = generateCode()
   const blob = new Blob([codeStr], { type: 'text/plain;charset=utf-8' })
   Download.saveAs(blob, data.fileName)
 }
 
-function execCopy(data) {
+function execCopy (data) {
   document.getElementById('copyNode').click()
 }
-function AssembleFormData() {
+function AssembleFormData () {
   formData.value = { fields: JSON.parse(JSON.stringify(drawingList.value)), ...formConf.value }
 }
-function generateCode() {
+function generateCode () {
   const { type } = generateConf.value
   AssembleFormData()
   const script = vueScript(makeUpJs(formData.value, type))

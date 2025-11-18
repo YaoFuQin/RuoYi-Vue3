@@ -20,7 +20,7 @@ export default defineComponent({
       default: ''
     },
   },
-  setup(props) {
+  setup (props) {
     return {
       iconName: computed(() => `#icon-${props.iconClass}`),
       svgClass: computed(() => {

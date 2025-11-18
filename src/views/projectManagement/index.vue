@@ -35,7 +35,12 @@
 
     <el-table v-loading="loading" :data="projectList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
-      <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" />
+      <!-- <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true" /> -->
+      <el-table-column label="项目名称" align="center" prop="projectName" :show-overflow-tooltip="true">
+        <template #default="scope">
+          <el-button link type="primary" @click="toDetails(scope.row)">{{ scope.row.projectName }}</el-button>
+        </template>
+      </el-table-column>
       <el-table-column label="项目地址" align="center" prop="projectAddress" :show-overflow-tooltip="true" />
       <el-table-column label="项目类型" align="center" prop="projectType" :show-overflow-tooltip="true" width="150" />
       <el-table-column label="显示排序" align="center" prop="orderNum" width="120" />
@@ -93,7 +98,6 @@
 </template>
 
 <script setup name="ProjectManagement">
-import { addPost, delPost, getPost, updatePost } from "@/api/system/post"
 import { projectManagement_list, projectManagement_detils, delProjectManagement, addProjectManagement, updateProjectManagement } from "@/api/projectManagement"
 
 const { proxy } = getCurrentInstance()
@@ -108,7 +112,9 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
-
+import { useRouter } from 'vue-router'
+const router = useRouter()
+import Cookies from "js-cookie"
 const data = reactive({
   form: {},
   queryParams: {
@@ -226,8 +232,6 @@ function submitForm () {
 /** 删除按钮操作 */
 function handleDelete (row) {
   const delIds = row.id || ids.value
-  console.log(delIds, 222);
-
   proxy.$modal.confirm('是否确认删除岗位编号为"' + delIds + '"的数据项？').then(function () {
     return delProjectManagement(delIds)
   }).then(() => {
@@ -242,6 +246,14 @@ function handleExport () {
     ...queryParams.value
   }, `post_${new Date().getTime()}.xlsx`)
 }
+
+/** 导出按钮操作 */
+function toDetails (row) {
+  Cookies.set("projectId", row.id, { expires: 30 })
+
+  router.push({ path: '/testDrag', query: { id: row.id } })
+}
+
 
 getList()
 </script>

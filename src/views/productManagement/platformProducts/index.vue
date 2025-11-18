@@ -85,7 +85,7 @@
               <el-table-column label="品牌名称" align="center" key="brand" prop="brand" v-if="columns.brand.visible"
                 :show-overflow-tooltip="true" />
               <el-table-column label="介绍" align="center" key="introduction" prop="introduction"
-                v-if="columns.introduction.visible" width="120" />
+                v-if="columns.introduction.visible" width="120" :show-overflow-tooltip="true" />
 
               <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns.createTime.visible"
                 width="160">
