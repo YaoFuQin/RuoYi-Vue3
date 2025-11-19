@@ -236,6 +236,6 @@ const handleKeywordChange = debounce(() => {
 }, 200)
 
 onMounted(() => {
-  initGetData()
+  // initGetData()
 })
 </script>

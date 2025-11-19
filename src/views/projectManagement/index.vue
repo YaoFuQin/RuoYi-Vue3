@@ -29,7 +29,14 @@
         <el-button type="danger" plain icon="el-icon-delete" :disabled="multiple" @click="handleDelete"
           v-hasPermi="['projectManagement:remove']">删除</el-button>
       </el-col>
-
+      <el-col :span="1.5">
+        <el-button type="warning" plain icon="Download" :disabled="multiple" @click="exportFun"
+          v-hasPermi="['productManagement:platformProducts:export']">导出报价单</el-button>
+      </el-col>
+      <el-col :span="1.5">
+        <el-button type="warning" plain icon="Download" :disabled="multiple" @click="exportByCategory"
+          v-hasPermi="['productManagement:platformProducts:export']">导出分类报价单</el-button>
+      </el-col>
       <right-toolbar v-model:showSearch="showSearch" @queryTable="getList"></right-toolbar>
     </el-row>
 
@@ -168,6 +175,18 @@ function reset () {
     remark: undefined
   }
   proxy.resetForm("postRef")
+}
+
+const exportFun = () => {
+  const projectsIds = ids.value.join(',')
+  proxy.download("/projectManagement/export?projectsIds=" + projectsIds, {
+  }, `项目报价单_${new Date().getTime()}.xlsx`)
+}
+
+const exportByCategory = () => {
+  const projectsIds = ids.value.join(',')
+  proxy.download("/projectManagement/exportByCategory?projectsIds=" + projectsIds, {
+  }, `项目分类报价单_${new Date().getTime()}.xlsx`)
 }
 
 /** 搜索按钮操作 */

@@ -540,6 +540,56 @@ const initGetScreenData = async () => {
   })
 }
 
+function extractDevicesFromScreenConfig(screenConfig) {
+  if (!screenConfig || typeof screenConfig !== 'object') {
+    console.warn('无效的配置对象');
+    return [];
+  }
+
+  const devices = [];
+
+  try {
+    // 检查screen数组是否存在
+    if (Array.isArray(screenConfig.screen)) {
+      screenConfig.screen.forEach(screen => {
+        // 检查screen中的objects数组
+        if (Array.isArray(screen.objects)) {
+          screen.objects.forEach(object => {
+            // 检查object中的states数组
+            if (Array.isArray(object.states)) {
+              object.states.forEach(state => {
+                // 检查state中的style对象和其中的device对象
+                if (state.style && state.style.device && typeof state.style.device === 'object') {
+                  devices.push({
+                    companyProductId: state.style.device.id,
+                    remark: state.style.device.remark || "",
+                    name: state.style.device.name || '',
+                    categoryId: state.style.device.categoryId,
+                    categoryName: state.style.device.categoryName,
+                    brand: state.style.device.brand || '',
+                    iconUrl: state.style.device.iconUrl,
+                    price: state.style.device.price || 0,
+                    unit: state.style.device.unit,
+                    num: state.style.device.num || 1,
+                    discountPrice: state.style.device.discountPrice || 0,
+                    region: state.style.device.region || '其他',
+                    introduction: state.style.device.introduction || '',
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+
+    return devices;
+  } catch (error) {
+    console.error('提取设备信息时发生错误:', error);
+    return [];
+  }
+}
+
 // 保存图纸
 const handleSaveData = async () => {
   let saveSuccess = false // 保存是否成功
@@ -548,12 +598,14 @@ const handleSaveData = async () => {
   // const fileFullName = route.params.id
   const fileFullName = queryData.id
   const content = JSON.stringify(pageData)
-  console.log(content, image, '02028028028');
-
+  console.log(content);
+  let productSelections = extractDevicesFromScreenConfig(JSON.parse(content))
 
   updateProjectManagement({
     id: route.query.id,
     jsonData: content,
+    productSelections,
+    image
   }).then(response => {
     useMessage.success('保存成功')
     saveSuccess = true

@@ -2,31 +2,19 @@
   功能：点击图层，会切换到对应的子屏,并选中图层(功能待完成)
 -->
 <template>
-  <el-dialog
-    v-model="visible"
-    class="datavis-search-dialog"
-    center
-    top="10vh"
-    width="336px"
-    :close-on-click-modal="true"
-    :modal="false"
-    :show-close="false"
-  >
+  <el-dialog v-model="visible" class="datavis-search-dialog" center top="10vh" width="336px"
+    :close-on-click-modal="true" :modal="false" :show-close="false">
     <el-input placeholder="请输入名称搜索组件、图层" ref="searchInputRef" v-model="keyWord" @input="handleSearch">
       <template #prefix>
         <visui-icon name="ele-search"></visui-icon>
       </template>
     </el-input>
     <el-scrollbar class="datavis-search-dialog-body" max-height="500px">
-      <div class="datavis-search-dialog-list" v-for="(item, index) in componentFilterData" :key="index" v-show="item.list.length > 0">
+      <div class="datavis-search-dialog-list" v-for="(item, index) in componentFilterData" :key="index"
+        v-show="item.list.length > 0">
         <div class="datavis-search-dialog-type">{{ item.label }}</div>
-        <div
-          class="datavis-search-dialog-item"
-          :class="{ mask: !it.isAuth }"
-          v-for="(it, idx) in item.list"
-          @click="handleObjectClick(it)"
-          :key="idx"
-        >
+        <div class="datavis-search-dialog-item" :class="{ mask: !it.isAuth }" v-for="(it, idx) in item.list"
+          @click="handleObjectClick(it)" :key="idx">
           <div class="datavis-search-item-img">
             <img v-if="it.image" :src="it.image" alt="" />
             <i v-else class="iconfont-bi icon-datavis-fenleiguanli"></i>
@@ -37,7 +25,8 @@
           </span>
         </div>
       </div>
-      <div class="datavis-search-dialog-list" v-for="(item, index) in layerFilterData" :key="index" v-show="item.list.length > 0">
+      <div class="datavis-search-dialog-list" v-for="(item, index) in layerFilterData" :key="index"
+        v-show="item.list.length > 0">
         <div class="datavis-search-dialog-type">{{ item.label }}</div>
         <div class="datavis-search-dialog-item" v-for="(it, idx) in item.list" @click="handleLayerClick(it)" :key="idx">
           <div class="datavis-search-item-img">
@@ -224,6 +213,6 @@ defineExpose({
 })
 
 onMounted(() => {
-  initGetComponentList()
+  // initGetComponentList()
 })
 </script>

@@ -5,7 +5,7 @@
       <div class="action">
         <visui-icon class="search-icon" name="ele-search" @click="handleOpen"></visui-icon>
         <div class="search-input" :class="{ 'is-active': state.visible }">
-          <el-input placeholder="请输入关键词" v-model="queryParams.name" clearable @input="handleSearch" @blur="">
+          <el-input placeholder="输入产品名称" v-model="queryParams.name" clearable @input="handleSearch" @blur="">
             <template #prefix>
               <visui-icon name="ele-search" :size="18"></visui-icon>
             </template>
@@ -17,7 +17,7 @@
 
     <div class="datavis-layer-bar--content">
       <div class="scrollbar-wrap">
-        <el-scrollbar style="height: 100vh;padding: 10px 10px;padding-bottom: 30px;">
+        <el-scrollbar @end-reached="handleScroll" height="80vh" style="padding: 10px 10px;padding-bottom: 30px;">
           <div class="list" ref="listRef">
             <div class="list-item" :draggable="true"
               style="height: 50px;display: flex;align-items: center;border-bottom: 1px #d1d5db1c solid;padding: 8px 10px;margin: 10px 0;"
@@ -41,8 +41,8 @@
                 :title="item.name">
                 {{ item.name }}</span> -->
             </div>
+            <div class="dw-empty" style="margin-top: 10px;text-align: center;" v-if="!hasMore">没有更多了</div>
           </div>
-          <!-- <div class="dw-empty" v-if="!state.loadingText && !state.dataList.length">暂无数据</div> -->
         </el-scrollbar>
       </div>
 
@@ -75,12 +75,59 @@ const productList = ref([])
 const data = reactive({
   queryParams: {
     pageNum: 1,
-    pageSize: 1000,
+    pageSize: 20,
     name: undefined,
     brand: undefined,
     categoryId: undefined
   }
 })
+// 是否还有更多数据
+const hasMore = ref(true);
+
+// const loadData = async (page: number) => {
+//   console.log(`正在加载第 ${page} 页数据...`);
+//   loading.value = true;
+
+//   // 模拟网络请求延迟
+//   await new Promise(resolve => setTimeout(resolve, 1000));
+
+//   // 模拟从后端获取数据
+//   const newData: DataItem[] = Array.from({ length: pageSize }, (_, index) => ({
+//     id: (page - 1) * pageSize + index + 1,
+//     content: `这是第 ${page} 页的第${index + 1} 条数据`,
+//   }));
+
+//   // 模拟数据加载完毕的情况（例如，总共只有 60 条数据）
+//   if (page >= 3) {
+//     hasMore.value = false;
+//   }
+
+//   // 将新数据追加到现有列表中
+//   dataList.value.push(...newData);
+//   loading.value = false;
+// };
+
+// --- 3. 核心滚动事件处理函数 ---
+const handleScroll = () => {
+  if (hasMore.value) {
+    queryParams.value.pageNum++;
+    getList();
+  }
+};
+
+/** 查询产品列表 */
+function getList() {
+  // 公司产品
+  companyProducts_list(queryParams.value).then(res => {
+    if (queryParams.value.pageNum * queryParams.value.pageSize >= res.total) {
+      hasMore.value = false;
+    }
+    productList.value.push(...res.rows);
+  })
+}
+
+
+
 // 数据转换
 const stringifyArray = (arr: any) => {
   arr = arr || []
@@ -136,15 +183,6 @@ const canMoveDown = computed(() => {
   return selectedCount === 1 && index < sameLevelCount && index > 0
 })
 
-/** 查询产品列表 */
-function getList() {
-  // 公司产品
-  companyProducts_list(queryParams.value).then(res => {
-    productList.value = res.rows
-  })
-}
-
-
 // 获取对象的所有父级id列表
 const getParentIdList = (arr: any) => {
   const parentIdObj: any = {}
@@ -193,6 +231,7 @@ watch(
 )
 // 搜索
 const handleSearch = debounce(val => {
+  queryParams.value.pageNum = 1
   getList()
   // if (val) {
   //   function filterData(data: any, keyword: any) {

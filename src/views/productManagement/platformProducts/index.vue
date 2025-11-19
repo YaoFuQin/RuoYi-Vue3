@@ -81,12 +81,13 @@
                 </template>
               </el-table-column>
               <el-table-column label="所属品类" align="center" key="categoryName" prop="categoryName"
-                v-if="columns.categoryName.visible" :show-overflow-tooltip="true" />
-              <el-table-column label="品牌名称" align="center" key="brand" prop="brand" v-if="columns.brand.visible"
-                :show-overflow-tooltip="true" />
+                v-if="columns.categoryName.visible" :show-overflow-tooltip="true" width="120" />
+              <el-table-column label="品牌名称" align="center" key="brand" width="120" prop="brand"
+                v-if="columns.brand.visible" :show-overflow-tooltip="true" />
+              <el-table-column label="单位" align="center" key="unit" width="120" prop="unit"
+                v-if="columns.unit.visible" />
               <el-table-column label="介绍" align="center" key="introduction" prop="introduction"
-                v-if="columns.introduction.visible" width="120" :show-overflow-tooltip="true" />
-
+                v-if="columns.introduction.visible" :show-overflow-tooltip="true" />
               <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns.createTime.visible"
                 width="160">
                 <template #default="scope">
@@ -148,6 +149,13 @@
         </el-row>
         <el-row>
           <el-col :span="24">
+            <el-form-item label="单位" prop="unit">
+              <el-input v-model="form.unit" placeholder="请输入单位" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="24">
             <el-form-item label="介绍" prop="introduction">
               <el-input v-model="form.introduction" type="textarea" placeholder="请输入内容"></el-input>
             </el-form-item>
@@ -164,17 +172,16 @@
 
     <!-- 产品导入对话框 -->
     <el-dialog :title="upload.title" v-model="upload.open" width="400px" append-to-body>
-      <el-upload ref="uploadRef" :limit="1" accept=".xlsx, .xls" :headers="upload.headers"
-        :action="upload.url + '?updateSupport=' + upload.updateSupport" :disabled="upload.isUploading"
-        :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess" :on-change="handleFileChange"
-        :on-remove="handleFileRemove" :auto-upload="false" drag>
+      <el-upload ref="uploadRef" :limit="1" accept=".xlsx, .xls" :headers="upload.headers" :action="upload.url"
+        :disabled="upload.isUploading" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess"
+        :on-change="handleFileChange" :on-remove="handleFileRemove" :auto-upload="false" drag>
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
         <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
         <template #tip>
           <div class="el-upload__tip text-center">
-            <div class="el-upload__tip">
+            <!-- <div class="el-upload__tip">
               <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的产品数据
-            </div>
+            </div> -->
             <span>仅允许导入xls、xlsx格式文件。</span>
             <el-link type="primary" :underline="false" style="font-size: 12px; vertical-align: baseline"
               @click="importTemplate">下载模板</el-link>
@@ -236,13 +243,14 @@ const upload = reactive({
   // 设置上传的请求头部
   headers: { Authorization: "Bearer " + getToken() },
   // 上传的地址
-  url: import.meta.env.VITE_APP_BASE_API + "/system/user/importData"
+  url: import.meta.env.VITE_APP_BASE_API + "/productManagement/platformProducts/import"
 })
 // 列显隐信息
 const columns = ref({
   name: { label: '产品名称', visible: true },
   iconUrl: { label: '图标', visible: true },
   categoryName: { label: '所属品类', visible: true },
+  unit: { label: '单位', visible: true },
   brand: { label: '品牌名称', visible: true },
   introduction: { label: '介绍', visible: true },
   createTime: { label: '创建时间', visible: true },
@@ -255,6 +263,7 @@ const data = reactive({
     pageSize: 10,
     name: undefined,
     brand: undefined,
+    unit: undefined,
     categoryId: undefined
   },
   rules: {
@@ -267,6 +276,9 @@ const data = reactive({
     ],
     categoryId: [
       { required: true, message: "请选择所属品类", trigger: "change" }
+    ],
+    unit: [
+      { required: true, message: "单位不能为空", trigger: "blur" }
     ],
     brand: [
       { required: true, message: "请选择所属品牌", trigger: "change" }
@@ -427,8 +439,8 @@ function handleImport () {
 
 /** 下载模板操作 */
 function importTemplate () {
-  proxy.download("system/user/importTemplate", {
-  }, `user_template_${new Date().getTime()}.xlsx`)
+  proxy.download("/productManagement/platformProducts/importTemplate", {
+  }, `平台产品_${new Date().getTime()}.xlsx`)
 }
 
 /**文件上传中处理 */
@@ -473,6 +485,7 @@ function reset () {
     iconUrl: undefined,
     categoryId: undefined,
     brand: undefined,
+    unit: undefined,
     introduction: undefined,
   }
   proxy.resetForm("userRef")

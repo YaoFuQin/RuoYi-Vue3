@@ -34,9 +34,12 @@
     </div>
 
     <div class="toolbar-right">
-      <!-- <topAction @click="handleExternal(pageOperationTypes.preview)" title="预览">
+      <topAction @click="exportByCategory" title="分类报价单">
         <visui-icon name="vis-yulan" :size="18"></visui-icon>
-      </topAction> -->
+      </topAction>
+      <topAction @click="exportFun" title="报价单">
+        <visui-icon name="vis-yulan" :size="18"></visui-icon>
+      </topAction>
       <topAction @click="handleExternal(pageOperationTypes.save)" title="保存项目">
         <visui-icon name="vis-baocun" :size="18"></visui-icon>
       </topAction>
@@ -121,6 +124,7 @@ import { companyProducts_list, platformProducts_list } from "@/api/productManage
 import topAction from './component/action.vue'
 import emitter from '../../../../../../utils/eventBus'
 
+
 const componentName = 'headerToolbar'
 defineOptions({ name: componentName })
 import useEditor from '../../hooks/useEditor'
@@ -155,6 +159,11 @@ const data = reactive({
     categoryId: undefined
   }
 })
+
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
 const activeName = ref('first')
 const { proxy } = getCurrentInstance()
 const { sys_brand_name } = proxy.useDict("sys_brand_name")
@@ -338,9 +347,28 @@ const togglePanelVisible = (type: 'left' | 'right') => {
  * 向外抛出事件
  */
 const handleExternal = (event: string) => {
-
   editor.fire(eventTypes.pageOperation, { type: event, source: componentName })
 }
+
+const exportByCategory = () => {
+  editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
+  setTimeout(() => {
+    proxy.download("/projectManagement/exportByCategory?projectsIds=" + route.query.id, {
+    }, `项目分类报价单_${new Date().getTime()}.xlsx`)
+  }, 1000);
+
+}
+
+const exportFun = () => {
+  editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
+  setTimeout(() => {
+    proxy.download("/projectManagement/export?projectsIds=" + route.query.id, {
+    }, `项目报价单_${new Date().getTime()}.xlsx`)
+  }, 1000);
+
+}
+
+
 const handleEditorStateUpdate = (state: EditorState) => {
   Object.assign(editorState.value, state)
 }

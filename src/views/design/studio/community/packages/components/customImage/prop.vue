@@ -7,23 +7,29 @@
         <visui-select-image v-model="state.src" @open="handleOpenImg" @input="handleStatePreview"
           @change="handleStateChange"></visui-select-image>
       </visui-item>
-      <visui-item label="设备名称">
-        <visui-input v-model="state.style.device.name" @change="handleStateChange" />
-      </visui-item>
-      <visui-item label="设备单价">
-        <visui-input-number suffix="元" v-model="state.style.device.price" @change="handleStateChange" />
-      </visui-item>
-      <visui-item label="设备折扣价">
-        <visui-input-number suffix="元" v-model="device.discountPrice" @change="handleStateChange" />
-      </visui-item>
-      <visui-item label="设备数量">
-        <visui-input-number suffix="台" v-model="device.price" @change="handleStateChange" />
-      </visui-item>
-      <visui-item label="设备房间">
-        <visui-select v-model="state.style.room" class="full-width" @change="handleStateChange">
-          <visui-option v-for="item in fitTypes" :key="item.value" :label="item.label" :value="item.value" />
-        </visui-select>
-      </visui-item>
+      <template v-if="isShow">
+        <visui-item label="设备名称">
+          <visui-input v-model="state.style.device.name" @change="handleStateChange" />
+        </visui-item>
+        <visui-item label="设备单价">
+          <visui-input-number suffix="元" v-model="state.style.device.price" @change="handleStateChange" />
+        </visui-item>
+        <visui-item label="设备折扣价">
+          <visui-input-number suffix="元" v-model="state.style.device.discountPrice" @change="handleStateChange" />
+        </visui-item>
+        <visui-item label="设备数量">
+          <visui-input-number suffix="台" v-model="state.style.device.num" @change="handleStateChange" />
+        </visui-item>
+        <visui-item label="设备房间">
+          <visui-select v-model="state.style.device.region" allow-create class="full-width" filterable
+            @change="handleStateChange">
+            <visui-option v-for="item in region_list" :key="item.value" :label="item.label" :value="item.value" />
+          </visui-select>
+        </visui-item>
+        <visui-item label="备注">
+          <visui-input v-model="state.style.device.remark" type="textarea" @change="handleStateChange" />
+        </visui-item>
+      </template>
       <!-- <visui-item label="图片适应">
         <visui-select v-model="state.style.objectFit" class="full-width" @change="handleStateChange">
           <visui-option v-for="item in fitTypes" :key="item.value" :label="item.label" :value="item.value" />
@@ -126,6 +132,10 @@ import { ref, reactive, computed, onUnmounted } from 'vue'
 const baseUrl = ref(import.meta.env.VITE_APP_VIEW_IMG_URL) // 图片预览地址
 
 import emitter from '../../../../../../../utils/eventBus'
+
+const { proxy } = getCurrentInstance()
+const { region_list } = proxy.useDict("region_list")
+
 // @ts-ignore
 import { handleAttrsChange, handleAttrsRecover, handleFinishStateNameDialog } from '../../datavis'
 import { eventTypes, pageOperationTypes } from '../../../utils/eventTypes'
@@ -140,9 +150,7 @@ const props = defineProps({
     }
   }
 })
-const device = reactive({
-  price: 0
-})
+const isShow = ref(false)
 const computedOpacity = computed({
   get: () => {
     return props.node.opacity * 100
@@ -168,21 +176,23 @@ const flexTabs = [
 ]
 
 const state: any = computed(() => props.node.states[props.node.stateIndex])
+const device: any = {}
 const stateNameDialogRef = ref()
-console.log(state.value, '020-22093744hjhdjhjdhjddjhdj');
+// const device: any = {
+//   price: 0,
+//   discountPrice: 0,
+//   num: 1,
+//   region: ''
+// }
 
-if (state.value.style.device) {
-} else {
-  state.value.style['device'] = {
-    categoryId: null,
-    name: '设备A',
-    type: '空调',
-    model: 'KFR-35GW/N8XHA1',
-    price: 3200,
-    discountPrice: 0,
-    room: '客厅'
-  }
-}
+// if (state.value.style.device) {
+// } else {
+
+//   //   setTimeout(() => {
+//   //     state.value.style['device'] = state.value.style.device
+//   //     console.log(state.value.style.device, 'props.node=====');
+//   //   }, 1000);
+// }
 
 const angleOption = [
   {
@@ -254,16 +264,30 @@ const handleStatePreview = () => {
 }
 
 function onSiblingEvent(payload) {
+  isShow.value = false
   console.log('兄弟事件收到：', payload)
+  device.value = payload
   state.value.src = baseUrl.value + payload.iconUrl
+  payload['num'] = 1
+  payload['remark'] = ""
+  payload['discountPrice'] = 0
+  // setTimeout(() => {
+  // payload['region'] = region_list.value[0].label
+  payload['region'] = '其他'
+  // }, 200)
   state.value.style['device'] = payload
   state.value.style['borderWidth'] = 3
   state.value.style['borderColor'] = 'red'
+  setTimeout(() => {
+    isShow.value = true
+  }, 250)
   handleStateChange()
   // console.log(state.value.style.device.name, 2020202);
 
 }
-
+setTimeout(() => {
+  isShow.value = true
+}, 250)
 emitter.on('siblingEvent', onSiblingEvent)
 
 onUnmounted(() => {
