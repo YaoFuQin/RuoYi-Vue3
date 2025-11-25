@@ -57,11 +57,11 @@ const useUserStore = defineStore('user', {
                         this.avatar = avatar
                         /* 初始密码提示 */
                         if (res.isDefaultModifyPwd) {
-                            ElMessageBox.confirm('您的密码还是初始密码，请修改密码！', '安全提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' })
-                                .then(() => {
-                                    router.push({ name: 'Profile', params: { activeTab: 'resetPwd' } })
-                                })
-                                .catch(() => {})
+                            // ElMessageBox.confirm('您的密码还是初始密码，请修改密码！', '安全提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' })
+                            //     .then(() => {
+                            //         router.push({ name: 'Profile', params: { activeTab: 'resetPwd' } })
+                            //     })
+                            //     .catch(() => {})
                         }
                         /* 过期密码提示 */
                         if (!res.isDefaultModifyPwd && res.isPasswordExpired) {

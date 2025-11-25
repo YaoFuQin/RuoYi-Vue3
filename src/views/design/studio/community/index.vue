@@ -590,6 +590,58 @@ function extractDevicesFromScreenConfig(screenConfig) {
   }
 }
 
+
+
+const processImage = async (base64) => {
+  const margin = 0
+  try {
+    // 创建图片对象
+    const img = new Image();
+    img.src = base64;
+
+    await new Promise((resolve, reject) => {
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+
+    // 计算新画布尺寸
+    const newWidth = img.width;
+    const newHeight = img.height;
+
+    // 创建画布
+    const canvas = document.createElement('canvas');
+    canvas.width = newWidth;
+    canvas.height = newHeight;
+    const ctx = canvas.getContext('2d');
+
+    // 设置背景颜色
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, newWidth, newHeight);
+
+    // 绘制原始图片到中心位置
+    ctx.drawImage(img, margin, margin, img.width, img.height);
+
+    // 获取扩展后的base64
+    const expandedBase64 = canvas.toDataURL('image/png');
+    console.log(expandedBase64, 2222);
+
+    // 显示结果
+    // this.expandedPreview.src = expandedBase64;
+    // this.expandedPreview.classList.remove('hidden');
+    // document.getElementById('expandedPlaceholder').classList.add('hidden');
+
+    // this.resultOutput.value = expandedBase64;
+    // this.downloadBtn.classList.remove('hidden');
+
+    // this.showStatus('图片处理完成！', 'success');
+
+  } catch (error) {
+    // this.showStatus('处理失败：图片数据可能无效', 'error');
+    // console.error('Error processing image:', error);
+  }
+}
+
+
 // 保存图纸
 const handleSaveData = async () => {
   let saveSuccess = false // 保存是否成功
@@ -600,6 +652,8 @@ const handleSaveData = async () => {
   const content = JSON.stringify(pageData)
   console.log(content);
   let productSelections = extractDevicesFromScreenConfig(JSON.parse(content))
+
+  // processImage(image)
 
   updateProjectManagement({
     id: route.query.id,

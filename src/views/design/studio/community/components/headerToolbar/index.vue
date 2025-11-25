@@ -34,6 +34,9 @@
     </div>
 
     <div class="toolbar-right">
+      <topAction @click="bitmap" title="点位图">
+        <visui-icon name="vis-yulan" :size="18"></visui-icon>
+      </topAction>
       <topAction @click="exportByCategory" title="分类报价单">
         <visui-icon name="vis-yulan" :size="18"></visui-icon>
       </topAction>
@@ -350,13 +353,22 @@ const handleExternal = (event: string) => {
   editor.fire(eventTypes.pageOperation, { type: event, source: componentName })
 }
 
+
+const bitmap = () => {
+  editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
+  setTimeout(() => {
+    proxy.download("/projectManagement/downloadImage?projectsIds=" + route.query.id, {
+    }, `点位图_${new Date().getTime()}.png`)
+  }, 1000);
+}
+
+
 const exportByCategory = () => {
   editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
   setTimeout(() => {
     proxy.download("/projectManagement/exportByCategory?projectsIds=" + route.query.id, {
     }, `项目分类报价单_${new Date().getTime()}.xlsx`)
   }, 1000);
-
 }
 
 const exportFun = () => {

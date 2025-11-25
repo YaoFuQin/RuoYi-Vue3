@@ -177,7 +177,7 @@
 
     <!-- 产品导入对话框 -->
     <el-dialog :title="upload.title" v-model="upload.open" width="400px" append-to-body>
-      <el-upload ref="uploadRef" :limit="1" accept=".xlsx, .xls" :headers="upload.headers" :action="upload.url"
+      <el-upload ref="uploadRef" :limit="1" accept=".xlsx" :headers="upload.headers" :action="upload.url"
         :disabled="upload.isUploading" :on-progress="handleFileUploadProgress" :on-success="handleFileSuccess"
         :on-change="handleFileChange" :on-remove="handleFileRemove" :auto-upload="false" drag>
         <el-icon class="el-icon--upload"><upload-filled /></el-icon>
@@ -187,9 +187,12 @@
             <!-- <div class="el-upload__tip">
               <el-checkbox v-model="upload.updateSupport" />是否更新已经存在的产品数据
             </div> -->
-            <span>仅允许导入xls、xlsx格式文件。</span>
-            <el-link type="primary" :underline="false" style="font-size: 12px; vertical-align: baseline"
-              @click="importTemplate">下载模板</el-link>
+            <div>
+              <span>仅允许导入xlsx格式文件</span>
+              <el-link type="primary" :underline="false" style="font-size: 12px; vertical-align: baseline"
+                @click="importTemplate">下载模板</el-link>
+            </div>
+            <div class="info_box">（导入图片要浮动于单元格上并且大小和位置随单元格而变）</div>
           </div>
         </template>
       </el-upload>
@@ -460,7 +463,7 @@ const handleFileSuccess = (response, file, fileList) => {
   upload.open = false
   upload.isUploading = false
   proxy.$refs["uploadRef"].handleRemove(file)
-  proxy.$alert("<div style='overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;'>" + response.msg + "</div>", "导入结果", { dangerouslyUseHTMLString: true })
+  proxy.$alert("<div style='overflow: auto;overflow-x: hidden;max-height: 70vh;padding: 10px 20px 0;'>" + response.  + "</div>", "导入结果", { dangerouslyUseHTMLString: true })
   getList()
 }
 
@@ -541,3 +544,14 @@ onMounted(() => {
   })
 })
 </script>
+
+<style lang="scss" scoped>
+.info_box {
+  font-weight: 600;
+  background: #FDF6ED;
+  color: #E6A23C;
+  margin-top: 10px;
+  padding: 8px 12px;
+  border-radius: 5px;
+}
+</style>

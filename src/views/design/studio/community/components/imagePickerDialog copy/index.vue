@@ -1,6 +1,6 @@
 <template>
-  <el-dialog title="图片选择" width="890px" style="opacity: 0" :modal="false" class="datavis-image-picker-dialog"
-    :close-on-click-modal="false" v-model="state.visible">
+  <el-dialog title="图片选择" width="890px" class="datavis-image-picker-dialog" :close-on-click-modal="false"
+    v-model="state.visible">
     <div class="datavis-image-picker-dialog-body">
       <div class="left-sidebar">
         <el-button @click="handleOpenGallyCate"><i class="iconfont-bi icon-bi-jia"></i>新增分类</el-button>
@@ -40,34 +40,6 @@
     <itemFolder ref="itemFolderRef" @finish="handleFinishFolder"></itemFolder>
     <!-- 上传素材 -->
     <itemUpload ref="itemUploadRef" @finish="handleFinishUpload"></itemUpload>
-
-
-
-    <input type="file" ref="uploadRef" @change="handleFileChange" id="fileInput" class="hidden"
-      accept="image/jpeg,image/jpg,image/png,image/gif">
-
-
-
-    <!-- <el-upload ref="uploadRef" action="/api/upload" :auto-upload="false" :show-file-list="true"
-      :on-change="handleFileChange">
-      <template #trigger>
-        <el-button type="primary" style="display: none">
-          选择文件
-        </el-button>
-      </template>
-
-<div class="upload-tip">
-  <p>弹窗打开后将自动弹出文件选择框</p>
-  <p>选择文件后点击下方上传按钮</p>
-</div>
-
-<el-button type="success" @click="submitUpload" :disabled="!fileList.length">
-  上传文件
-</el-button>
-</el-upload> -->
-
-    <!-- <ImageUpload ref="inputImgRef" :isShowTip="true" :limit="1" v-model="state.iconUrl"></ImageUpload> -->
-
   </el-dialog>
 </template>
 
@@ -75,23 +47,14 @@
 defineOptions({
   name: 'imagePickerDialog'
 })
-import { ref, reactive, nextTick, watch } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
 import datavisApi from '@/api/datavisApi'
 import { editorEmptyImgUrl, getObjFromTreeData, getScrollTreeState, setScrollTreeState } from '../../utils'
 import itemFolder from './component/folder.vue'
 import itemUpload from './component/upload.vue'
-import { getToken } from "@/utils/auth"
-const { proxy } = getCurrentInstance()
-
-const uploadRef = ref()
-const selectedFile = ref(null)
-const baseUrl = import.meta.env.VITE_APP_BASE_API
-const imageBaseUrl = import.meta.env.VITE_APP_VIEW_IMG_URL
-
 
 const emit = defineEmits(['finish'])
 const state = reactive({
-  iconUrl: '',
   config: {
     title: '素材-图片',
     type: '310',
@@ -215,126 +178,19 @@ const handleFinishFolder = () => {
 const itemUploadRef = ref<any>()
 const handleOpenUpload = () => {
   console.log('state.classRow', state)
-  state.callbackFun && state.callbackFun({ url: 'https://www.bing.com/th?id=OHR.AloeDichotoma_ZH-CN4432972312_1920x1080.jpg&rf=LaDigue_1920x1080.jpg&pid=hp&w=360&h=202' })
-  state.visible = false
-
-  // const data = {
-  //   folder: state.config.folder + state.classRow.url,
-  //   form: {
-  //     id: '',
-  //     name: '',
-  //     url: '',
-  //     image: '',
-  //     parent_id: state.classRow.id,
-  //     type: state.config.type,
-  //     sort: 0
-  //   }
-  // }
-  // itemUploadRef.value.handleOpenDialog(data)
-}
-
-watch(() => state.visible, val => {
-  if (val) {
-    setTimeout(() => {
-      uploadRef.value.click()
-    }, 200)
-  }
-}, { deep: true, immediate: true })
-
-// 处理上传
-const handleUpload = () => {
-  if (!selectedFile.value) {
-    // ElMessage.warning('请先选择文件')
-    return
-  }
-
-  // 这里添加实际的上传逻辑
-  // ElMessage.success('文件上传成功！')
-  // console.log('上传文件:', selectedFile.value)
-
-  // 上传完成后关闭对话框
-  // handleClose()
-}
-
-
-
-/**
- * 获取图片宽高（通过 File 对象，如上传图片）
- * @param file File 实例
- */
-function getImageSizeFromFile(file: File): Promise<{ width: number; height: number }> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-
-    reader.onload = (e) => {
-      const img = new Image()
-      img.src = e.target?.result as string
-
-      img.onload = () => {
-        resolve({
-          width: img.naturalWidth,
-          height: img.naturalHeight
-        })
-      }
-
-      img.onerror = () => {
-        reject(new Error('图片加载失败（File）'))
-      }
+  const data = {
+    folder: state.config.folder + state.classRow.url,
+    form: {
+      id: '',
+      name: '',
+      url: '',
+      image: '',
+      parent_id: state.classRow.id,
+      type: state.config.type,
+      sort: 0
     }
-
-    reader.onerror = () => {
-      reject(new Error('读取文件失败'))
-    }
-
-    reader.readAsDataURL(file)
-  })
-}
-
-// 处理文件选择变化
-const handleFileChange = async (event) => {
-  const file = event.target.files[0]
-  if (!file) return
-  selectedFile.value = file
-
-  // const size = await getImageSizeFromFile(file)
-
-  uploadImage(file)
-  // 生成预览
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    // previewUrl.value = e.target.result
   }
-  reader.readAsDataURL(file)
-}
-
-const uploadImage = async (file) => {
-  try {
-    // 创建FormData
-    const formData = new FormData();
-    formData.append('file', file);
-    // formData.append('timestamp', Date.now());
-
-    // 发送请求
-    const response = await fetch(baseUrl + '/common/upload', {
-      method: 'POST',
-      headers: {
-        // ...this.options.headers
-        Authorization: "Bearer " + getToken()
-      },
-      body: formData
-    })
-    const result = await response.json();
-    if (response.ok && result.code === 200) {
-      state.callbackFun && state.callbackFun({ url: imageBaseUrl + result.fileName })
-      state.visible = false
-    } else {
-      state.visible = false
-      proxy.$modal.msgError(result.msg || '上传失败')
-    }
-  } catch (err) {
-    proxy.$modal.msgError(err || '上传失败')
-    state.visible = false
-  }
+  itemUploadRef.value.handleOpenDialog(data)
 }
 
 const handleFinishUpload = async () => {
