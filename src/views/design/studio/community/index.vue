@@ -657,18 +657,18 @@ const handleSaveData = async () => {
 
   processImage(image)
 
-  // setTimeout(() => {
-  updateProjectManagement({
-    id: route.query.id,
-    jsonData: content,
-    productSelections,
-    image: imgurl.value
-  }).then(response => {
-    useMessage.success('保存成功')
-    saveSuccess = true
-    graphString = JSON.stringify(omit(pageData, ['info'])) // 更新全局变量图纸数据
-  })
-  // }, 500)
+  setTimeout(() => {
+    updateProjectManagement({
+      id: route.query.id,
+      jsonData: content,
+      productSelections,
+      image: imgurl.value
+    }).then(response => {
+      useMessage.success('保存成功')
+      saveSuccess = true
+      graphString = JSON.stringify(omit(pageData, ['info'])) // 更新全局变量图纸数据
+    })
+  }, 500)
 
   // const jsonFile = new File([content], `${fileFullName}.json`, {
   //   type: 'text/json'

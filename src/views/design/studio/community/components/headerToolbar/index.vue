@@ -399,7 +399,7 @@ const shareFun = () => {
       share_url.value = 'https://yilaxcx.openhola.com?shareCode=' + response.data
       dialog_share.value = true
     })
-  }, 1000)
+  }, 1500)
 }
 
 
@@ -408,7 +408,7 @@ const bitmap = () => {
   setTimeout(() => {
     proxy.download("/projectManagement/downloadImage?projectsIds=" + route.query.id, {
     }, `点位图_${new Date().getTime()}.png`)
-  }, 1000);
+  }, 1500);
 }
 
 
@@ -417,7 +417,7 @@ const exportByCategory = () => {
   setTimeout(() => {
     proxy.download("/projectManagement/exportByCategory?projectsIds=" + route.query.id, {
     }, `项目分类报价单_${new Date().getTime()}.xlsx`)
-  }, 1000);
+  }, 1500);
 }
 
 const exportFun = () => {
@@ -425,7 +425,7 @@ const exportFun = () => {
   setTimeout(() => {
     proxy.download("/projectManagement/export?projectsIds=" + route.query.id, {
     }, `项目报价单_${new Date().getTime()}.xlsx`)
-  }, 1000);
+  }, 1500);
 
 }
 
