@@ -5,7 +5,7 @@
       <div class="action">
         <visui-icon class="search-icon" name="ele-search" @click="handleOpen"></visui-icon>
         <div class="search-input" :class="{ 'is-active': state.visible }">
-          <el-input placeholder="输入产品名称" v-model="queryParams.name" clearable @input="handleSearch" @blur="">
+          <el-input placeholder="输入产品名称" v-model="queryParams.name" clearable @input="handleSearch">
             <template #prefix>
               <visui-icon name="ele-search" :size="18"></visui-icon>
             </template>
@@ -116,7 +116,7 @@ const handleScroll = () => {
 };
 
 /** 查询产品列表 */
-function getList() {
+function getList(type) {
   // 公司产品
   companyProducts_list(queryParams.value).then(res => {
     if (queryParams.value.pageNum * queryParams.value.pageSize >= res.total) {
@@ -230,6 +230,13 @@ watch(
   { deep: true }
 )
 // 搜索
+
+
+// const handleSearch = (val) => {
+//   queryParams.value.pageNum = 1
+//   getList('Search')
+// }
+
 const handleSearch = debounce(val => {
   queryParams.value.pageNum = 1
   getList()
@@ -308,7 +315,7 @@ const recursionHanldeData = (arr: any = [], level = 1, parentId = '') => {
 const handleLayerChanged = (data: any) => {
   const list = stringifyArray(data)
   state.originList = recursionHanldeData(list)
-  handleSearch(keyWord.value)
+  // handleSearch(keyWord.value)
 }
 const handleEditorStateUpdated = (e: any) => {
   editorState.value = e

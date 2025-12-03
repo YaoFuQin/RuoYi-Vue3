@@ -11,20 +11,20 @@
         <visui-item label="设备名称">
           <visui-input v-model="state.style.device.name" @change="handleStateChange" />
         </visui-item>
-        <visui-item label="设备单价">
-          <visui-input-number suffix="元" v-model="state.style.device.price" @change="handleStateChange" />
-        </visui-item>
-        <visui-item label="设备折扣价">
-          <visui-input-number suffix="元" v-model="state.style.device.discountPrice" @change="handleStateChange" />
-        </visui-item>
-        <visui-item label="设备数量">
-          <visui-input-number suffix="台" v-model="state.style.device.num" @change="handleStateChange" />
-        </visui-item>
-        <visui-item label="设备房间">
+        <visui-item label="设备位置">
           <visui-select v-model="state.style.device.region" allow-create class="full-width" filterable
             @change="handleStateChange">
             <visui-option v-for="item in region_list" :key="item.value" :label="item.label" :value="item.value" />
           </visui-select>
+        </visui-item>
+        <visui-item label="设备数量">
+          <visui-input-number suffix="台" v-model="state.style.device.num" @change="handleStateChange" />
+        </visui-item>
+        <visui-item label="设备价格">
+          <visui-input-number suffix="元" v-model="state.style.device.price" @change="handleStateChange" />
+        </visui-item>
+        <visui-item label="设备折扣价">
+          <visui-input-number suffix="元" v-model="state.style.device.discountPrice" @change="handleStateChange" />
         </visui-item>
         <visui-item label="备注">
           <visui-input v-model="state.style.device.remark" type="textarea" @change="handleStateChange" />
@@ -277,7 +277,7 @@ function onSiblingEvent(payload) {
   // }, 200)
   state.value.style['device'] = payload
   state.value.style['borderWidth'] = 3
-  state.value.style['borderColor'] = 'red'
+  state.value.style['borderColor'] = '#5182D5'
   setTimeout(() => {
     isShow.value = true
   }, 250)

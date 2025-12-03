@@ -42,6 +42,9 @@ import dayjs from 'dayjs'
 import datavisApi from '@/api/datavisApi.ts'
 import { pick, omit } from 'lodash-es'
 
+import emitter from '@/utils/eventBus'
+
+
 const componentName = 'datavisFrame'
 defineOptions({
   name: componentName
@@ -59,6 +62,7 @@ const route = useRoute()
 const dataPreviewDialogRef = ref()
 const imagePickerDialogRef = ref()
 const projectName = ref('')
+const imgurl = ref('')
 
 const state = reactive({
   screenType: 'screen', // 页面类型，screen：大屏，component：模块 , market:模板
@@ -431,7 +435,7 @@ const handleFinishBack = async (type?: any) => {
 const initGetScreenData = async () => {
   state.loadingText = '正在加载中...'
   // const params = { id: route.params.id }
-  console.log(route.query.id, 2222);
+  // console.log(route.query.id, 2222);
 
   projectManagement_detils(route.query.id).then(res => {
     const data = res.data
@@ -532,7 +536,7 @@ const initGetScreenData = async () => {
       datavisEditorRef.value.exposeImportData(parseData)
       state.loadingText = ''
     }
-    console.log(blob, 39839398)
+    // console.log(blob, 39839398)
     reader.readAsText(blob, 'utf-8')
     state.loadingText = ''
   }).catch(() => {
@@ -589,58 +593,56 @@ function extractDevicesFromScreenConfig(screenConfig) {
     return [];
   }
 }
-
-
-
-const processImage = async (base64) => {
-  const margin = 0
-  try {
-    // 创建图片对象
-    const img = new Image();
-    img.src = base64;
-
-    await new Promise((resolve, reject) => {
-      img.onload = resolve;
-      img.onerror = reject;
-    });
-
-    // 计算新画布尺寸
-    const newWidth = img.width;
-    const newHeight = img.height;
-
-    // 创建画布
-    const canvas = document.createElement('canvas');
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-    const ctx = canvas.getContext('2d');
-
-    // 设置背景颜色
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0, 0, newWidth, newHeight);
-
-    // 绘制原始图片到中心位置
-    ctx.drawImage(img, margin, margin, img.width, img.height);
-
-    // 获取扩展后的base64
-    const expandedBase64 = canvas.toDataURL('image/png');
-    console.log(expandedBase64, 2222);
-
-    // 显示结果
-    // this.expandedPreview.src = expandedBase64;
-    // this.expandedPreview.classList.remove('hidden');
-    // document.getElementById('expandedPlaceholder').classList.add('hidden');
-
-    // this.resultOutput.value = expandedBase64;
-    // this.downloadBtn.classList.remove('hidden');
-
-    // this.showStatus('图片处理完成！', 'success');
-
-  } catch (error) {
-    // this.showStatus('处理失败：图片数据可能无效', 'error');
-    // console.error('Error processing image:', error);
-  }
+const aaa = async (data) => {
+  const { pageData } = await datavisEditorRef.value.exposeGetSaveData()
+  let pageDataJson = JSON.parse(JSON.stringify(pageData))
+  pageDataJson.config.width = data.width
+  pageDataJson.config.height = data.height
+  datavisEditorRef.value.exposeImportData(pageDataJson)
 }
 
+emitter.on('changeBackground', aaa)
+
+const processImage = async (image, margin = 200, color = 'white') => {
+  // const { pageData, image } = await datavisEditorRef.value.exposeGetSaveData()
+  // 1. 加载原始图片，获取尺寸
+  const img = new Image()
+  img.src = image
+  img.onload = () => {
+
+    // 2. 动态设置Canvas尺寸（按需扩展，此处以“扩展50像素边距”为例）
+    const canvas = document.createElement('canvas')
+    canvas.width = (img.width + margin * 2)
+    canvas.height = (img.height + margin * 2)
+    const ctx = canvas.getContext('2d')!
+
+
+
+    // 3. 填充背景（避免白色区域）
+    ctx.fillStyle = color || 'white'
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+    // 4. 绘制原始图片到中心位置
+    ctx.drawImage(img, margin, margin, (img.width), (img.height))
+
+
+    // // 获取文字宽度（需先设置字体样式）
+    // ctx.font = '50px Arial' // 示例字体样式
+    // const textWidth = ctx.measureText('厦门HOLA科技').width
+
+    // // 右上角x坐标：canvas宽度 - 文字宽度 - 右侧空白（margin）
+    // const x = canvas.width - textWidth - 50
+    // const y = 100 // 右上角y坐标（接近0的偏移量，如margin）
+
+    // // 5. 绘制右上角文字
+    // ctx.fillStyle = 'black' // 文字颜色
+    // ctx.font = '40px Arial' // 字体样式
+    // ctx.fillText('厦门HOLA科技', x, y) // 文字位置（右上角）
+    const quality = 0.5; // 画质（0-1，0.8为推荐平衡值）
+    // 5. 转换为Base64并显示
+    imgurl.value = canvas.toDataURL('image/png', quality)
+  }
+}
 
 // 保存图纸
 const handleSaveData = async () => {
@@ -650,21 +652,23 @@ const handleSaveData = async () => {
   // const fileFullName = route.params.id
   const fileFullName = queryData.id
   const content = JSON.stringify(pageData)
-  console.log(content);
+  // console.log(content);
   let productSelections = extractDevicesFromScreenConfig(JSON.parse(content))
 
-  // processImage(image)
+  processImage(image)
 
+  // setTimeout(() => {
   updateProjectManagement({
     id: route.query.id,
     jsonData: content,
     productSelections,
-    image
+    image: imgurl.value
   }).then(response => {
     useMessage.success('保存成功')
     saveSuccess = true
     graphString = JSON.stringify(omit(pageData, ['info'])) // 更新全局变量图纸数据
   })
+  // }, 500)
 
   // const jsonFile = new File([content], `${fileFullName}.json`, {
   //   type: 'text/json'
@@ -737,13 +741,23 @@ onMounted(() => {
   setTimeout(() => {
     // 1. 选中所有匹配的元素
     const elements = document.querySelectorAll('.page-bar_board_item');
+    const elements1 = document.querySelectorAll('.visui-item');
     // 2. 遍历并删除每个元素
-    elements.forEach((el, index) => {
+    elements.forEach((el: any, index) => {
       if (index == 0 || index == elements.length - 1) {
-        el.remove();
+        // el.remove();
+        // console.log(el, 'page-bar_board_item');
+        el.style.display = 'none'; // 隐藏元素
       }
     });
-  }, 500);
+    elements1.forEach((el: any, index) => {
+      if (index == 0) {
+        // console.log(el, 'visui-item');
+        // el.remove();
+        el.style.display = 'none'; // 隐藏元素
+      }
+    });
+  }, 2500);
   document.removeEventListener('visibilitychange', handleVisibilityChange)
 })
 </script>

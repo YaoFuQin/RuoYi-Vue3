@@ -60,3 +60,12 @@ export function companyProducts_addPage(data) {
         data,
     })
 }
+
+// 生成校验码
+export function getShare(query) {
+    return request({
+        url: '/projectManagement/getShare',
+        method: 'get',
+        params: query,
+    })
+}

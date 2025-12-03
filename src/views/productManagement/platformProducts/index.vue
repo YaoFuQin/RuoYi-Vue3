@@ -3,7 +3,7 @@
     <el-row :gutter="20">
       <splitpanes :horizontal="appStore.device === 'mobile'" class="default-theme">
         <!--c产品品类数据-->
-        <pane size="16">
+        <pane size="15">
           <el-col>
             <div class="head-container">
               <el-input v-model="categoryName" placeholder="请输入品类名称" clearable prefix-icon="Search"
@@ -17,7 +17,7 @@
           </el-col>
         </pane>
         <!--产品数据-->
-        <pane size="84">
+        <pane size="85">
           <el-col>
             <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
               <el-form-item label="产品名称" prop="name">
@@ -84,14 +84,14 @@
                 v-if="columns.categoryName.visible" :show-overflow-tooltip="true" width="120" />
               <el-table-column label="品牌名称" align="center" key="brand" width="120" prop="brand"
                 v-if="columns.brand.visible" :show-overflow-tooltip="true" />
-              <el-table-column label="单位" align="center" key="unit" width="120" prop="unit"
+              <el-table-column label="单位" align="center" key="unit" width="80" prop="unit"
                 v-if="columns.unit.visible" />
               <el-table-column label="介绍" align="center" key="introduction" prop="introduction"
                 v-if="columns.introduction.visible" :show-overflow-tooltip="true" />
               <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns.createTime.visible"
-                width="160">
+                width="100">
                 <template #default="scope">
-                  <span>{{ parseTime(scope.row.createTime) }}</span>
+                  <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
@@ -115,7 +115,7 @@
     </el-row>
 
     <!-- 添加或修改产品配置对话框 -->
-    <el-dialog :title="title" v-model="open" width="600px" append-to-body>
+    <el-dialog :title="title" v-model="open" width="600px" :append-to-body="true">
       <el-form :model="form" :rules="rules" ref="userRef" label-width="80px">
         <el-row>
           <el-col :span="24">
@@ -315,9 +315,8 @@ function getDeptTree () {
     let data = response.data
     enabledCategoryOptions.value = []
     categoryOptions.value = []
-    categoryOptions.value = [{ categoryId: undefined, categoryName: '所有', children: [] }, ...proxy.handleTree(data, "categoryId")]
-    enabledCategoryOptions.value = proxy.handleTree(data, "categoryId")
-
+    categoryOptions.value = [{ categoryId: undefined, categoryName: '所有', children: [] }, ...proxy.handleTree(JSON.parse(JSON.stringify(data)), "categoryId")]
+    enabledCategoryOptions.value = proxy.handleTree(JSON.parse(JSON.stringify(data)), "categoryId")
   })
 }
 /** 节点单击事件 */

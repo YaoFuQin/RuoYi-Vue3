@@ -60,9 +60,9 @@
       <el-table-column label="操作" width="180" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:post:edit']">修改</el-button>
+            v-hasPermi="['projectManagement:edit']">修改</el-button>
           <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-            v-hasPermi="['system:post:remove']">删除</el-button>
+            v-hasPermi="['projectManagement:remove']">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -72,7 +72,7 @@
 
 
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
-      <!-- 添加或修改岗位对话框 -->
+      <!-- 添加或修改项目对话框 -->
 
       <el-form ref="postRef" :model="form" :rules="rules" label-width="100px">
         <el-form-item label="项目名称" prop="projectName">
@@ -147,7 +147,7 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data)
 
-/** 查询岗位列表 */
+/** 查询项目列表 */
 function getList () {
   loading.value = true
   projectManagement_list(queryParams.value).then(response => {
@@ -212,7 +212,7 @@ function handleSelectionChange (selection) {
 function handleAdd () {
   reset()
   open.value = true
-  title.value = "添加岗位"
+  title.value = "添加项目"
 }
 
 /** 修改按钮操作 */
@@ -221,8 +221,16 @@ function handleUpdate (row) {
   const id = row.id || ids.value
   projectManagement_detils(id).then(response => {
     form.value = response.data
+    form.value = {
+      id: response.data.id,
+      projectName: response.data.projectName,
+      projectAddress: response.data.projectAddress,
+      projectType: response.data.projectType,
+      orderNum: response.data.orderNum,
+      remark: response.data.remark,
+    }
     open.value = true
-    title.value = "修改岗位"
+    title.value = "修改项目"
   })
 }
 
@@ -250,7 +258,7 @@ function submitForm () {
 /** 删除按钮操作 */
 function handleDelete (row) {
   const delIds = row.id || ids.value
-  proxy.$modal.confirm('是否确认删除岗位编号为"' + delIds + '"的数据项？').then(function () {
+  proxy.$modal.confirm('是否确认删除项目编号为"' + delIds + '"的数据项？').then(function () {
     return delProjectManagement(delIds)
   }).then(() => {
     getList()
@@ -269,7 +277,7 @@ function handleExport () {
 function toDetails (row) {
   Cookies.set("projectId", row.id, { expires: 30 })
 
-  router.push({ path: '/testDrag', query: { id: row.id } })
+  router.push({ path: '/projectDrag', query: { id: row.id } })
 }
 
 

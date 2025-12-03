@@ -1,6 +1,6 @@
 <template>
   <div class="preview-wrapper">
-    <datavis-render-view ref="datavisRenderRef" @event="handleRenderCommand"></datavis-render-view>
+    <!-- <datavis-render-view ref="datavisRenderRef" @event="handleRenderCommand"></datavis-render-view> -->
   </div>
 </template>
 <script lang="ts" setup>
@@ -8,8 +8,8 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import localforage from 'localforage'
 import { draftStroageKey } from '../studio/community/utils/name'
-import datavisApi from '@/api/datavisApi'
-import datavisRenderView from '../../community/view/datavisRenderView/index.vue'
+// import datavisRenderView from '../../community/view/datavisRenderView/index.vue'
+// import datavisRenderView from '../../design/studio/community/'
 
 defineOptions({
   name: 'DatavisView'

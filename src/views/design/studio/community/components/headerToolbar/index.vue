@@ -9,10 +9,10 @@
       <!-- <topAction @click="showDialog(componentBarRef)" title="组件" :class="{ active: componentBarRef === temporaryRef }">
         <visui-icon name="vis-zujian1" :size="18"></visui-icon>
       </topAction> -->
-      <topAction @dragstart="aaaaaa1($event)" @dragend="handleDragEnd($event)" draggable="true" title="添加设备"
+      <!-- <topAction @dragstart="aaaaaa1($event)" @dragend="handleDragEnd($event)" draggable="true" title="添加设备"
         :class="{ active: componentBarRef === temporaryRef }">
         <visui-icon name="vis-zujian1" :size="18"></visui-icon>
-      </topAction>
+      </topAction> -->
     </div>
     <div class="toolbar-center">
       <topAction @click="handleEditorCoreAction(operationTypes.undo)" title="后退"
@@ -34,6 +34,9 @@
     </div>
 
     <div class="toolbar-right">
+      <topAction @click="shareFun" title="分享">
+        <visui-icon name="vis-yulan" :size="18"></visui-icon>
+      </topAction>
       <topAction @click="bitmap" title="点位图">
         <visui-icon name="vis-yulan" :size="18"></visui-icon>
       </topAction>
@@ -109,6 +112,22 @@
         </div>
       </template>
     </el-dialog>
+
+    <el-dialog v-model="dialog_share" :show-close="true" :close-on-click-modal="false" append-to-body title="分享">
+      <div class="qr-code-container">
+        <div id="codeImg" ref="qrcodeCanvas"
+          style="padding:30px;display:flex;flex-direction: column;align-items: center;justify-content: center;">
+          <p class="link-text">您的智能家居方案已完成，请扫码查阅!</p>
+          <div style="">
+            <QrcodeVue :value="share_url" :size="200" level="M" />
+          </div>
+          <p class="link-text" style="color:#ccc">由Yila.OpenHola.com智能设计驱动!</p>
+          <!-- <p class=" link-text">{{ share_url }}</p> -->
+        </div>
+        <el-button type="primary" @click="downloadQRCode">下载二维码</el-button>
+      </div>
+    </el-dialog>
+
     <!-- 组件 -->
     <component-bar ref="componentBarRef" @finish="handleFinishDialog(componentBarRef)"></component-bar>
     <!-- 系统素材 -->
@@ -123,9 +142,17 @@ import type { EditorState } from '../../types/index'
 
 import { listCategory } from "@/api/system/category"
 import { companyProducts_list, platformProducts_list } from "@/api/productManagement"
+import { getShare } from "@/api/projectManagement"
 
 import topAction from './component/action.vue'
 import emitter from '../../../../../../utils/eventBus'
+
+
+import QrcodeVue from 'qrcode.vue'
+import html2canvas from 'html2canvas';
+const qrcodeCanvas = ref<HTMLCanvasElement | null>(null);
+const dialog_share = ref(false)
+const share_url = ref('https://example.com/share?room=123456')
 
 
 const componentName = 'headerToolbar'
@@ -189,34 +216,47 @@ const handleChange = (tab: TabsPaneContext, event: Event) => {
 /** 搜索按钮操作 */
 function handleQuery() {
   queryParams.value.pageNum = 1
-  getList()
+  // getList()
 }
 /** 查询产品列表 */
-function getList() {
-  loading.value = true
-  if (activeName.value === 'first') {
-    console.log('公司产品');
+// function getList() {
+//   loading.value = true
+//   if (activeName.value === 'first') {
+//     console.log('公司产品');
+//     // 公司产品
+//     companyProducts_list(queryParams.value).then(res => {
+//       loading.value = false
+//       productList.value = res.rows
+//       total.value = res.total
+//     })
+//   } else if (activeName.value === 'second') {
+//     console.log('平台产品');
+//     // 平台产品
+//     platformProducts_list(queryParams.value).then(res => {
+//       loading.value = false
+//       productList.value = res.rows
+//       total.value = res.total
+//     })
+//   }
+// }
 
-    // 公司产品
-    companyProducts_list(queryParams.value).then(res => {
-      loading.value = false
-      productList.value = res.rows
-      total.value = res.total
-    })
-  } else if (activeName.value === 'second') {
-    console.log('平台产品');
-    // 平台产品
-    platformProducts_list(queryParams.value).then(res => {
-      loading.value = false
-      productList.value = res.rows
-      total.value = res.total
-    })
-
-  }
-
-
+/** 下载二维码 */
+const downloadQRCode = () => {
+  html2canvas(qrcodeCanvas.value).then((canvas) => {
+    const link = document.createElement('a');
+    link.href = canvas.toDataURL('image/png');
+    link.download = '图片下载.png';
+    link.click();
+  });
+  // if (!qrcodeCanvas.value) return;
+  // const canvas = qrcodeCanvas.value;
+  // console.log(canvas, 2222);
+  // const dataURL = canvas.toDataURL('image/png');
+  // const link = document.createElement('a');
+  // link.href = dataURL;
+  // link.download = 'qrcode.png';
+  // link.click();
 }
-
 
 /** 提交按钮 */
 function submitForm() {
@@ -233,7 +273,7 @@ function resetQuery() {
   proxy.resetForm("queryRef")
   queryParams.value.categoryId = undefined
   queryParams.value.pageNum = 1
-  getList()
+  // getList()
 }
 
 
@@ -275,7 +315,6 @@ function getDeptTree() {
     let data = response.data
     enabledCategoryOptions.value = []
     enabledCategoryOptions.value = proxy.handleTree(data, "categoryId")
-
   })
 }
 
@@ -303,7 +342,7 @@ const aaaaaa1 = (e: DragEvent, row: any) => {
   }
 }
 const handleDragEnd = (e: DragEvent) => {
-  getList()
+  // getList()
   dialogTableVisible.value = true
 }
 
@@ -353,6 +392,16 @@ const handleExternal = (event: string) => {
   editor.fire(eventTypes.pageOperation, { type: event, source: componentName })
 }
 
+const shareFun = () => {
+  editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
+  setTimeout(() => {
+    getShare({ projectsId: route.query.id }).then(response => {
+      share_url.value = 'https://yilaxcx.openhola.com?shareCode=' + response.data
+      dialog_share.value = true
+    })
+  }, 1000)
+}
+
 
 const bitmap = () => {
   editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
@@ -398,3 +447,18 @@ onBeforeUnmount(() => {
   handleEvents({ isDispose: false })
 })
 </script>
+<style scoped>
+.qr-code-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.link-text {
+  word-break: break-all;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+</style>

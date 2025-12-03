@@ -19,6 +19,8 @@ import { backgroundFilterData, filterData } from './interface'
 import useEditor from '../../hooks/useEditor'
 const { editor } = useEditor()
 
+import emitter from '@/utils/eventBus'
+
 defineOptions({ name: 'datavisSettingBar' })
 
 defineProps({
@@ -41,8 +43,27 @@ const handleRecover = ({ keys }: any) => {
 }
 
 // 改变配置数据
+// 改变配置数据
 const handleChange = ({ keys, flag }: any) => {
   handleEditorConfigChange(keys, editor, pageConfig.value, flag)
+  const img = new Image()
+  img.src = pageConfig.value.backgroundImage
+  img.onload = () => {
+    // console.log(img.naturalWidth, img.naturalHeight, '2020020020020');
+    if (keys.includes('backgroundImage')) {
+      // 如果是更改背景图片，则修改画布尺寸为图片尺寸
+      // pageConfig.value.width = img.naturalWidth
+      // pageConfig.value.height = img.naturalHeight
+      emitter.emit('changeBackground', {
+        width: (img.naturalWidth / 1.5) < 1000 ? img.naturalWidth : img.naturalWidth / 1.5,
+        height: (img.naturalHeight / 1.5) < 1000 ? img.naturalHeight : img.naturalHeight / 1.5,
+        // width: img.naturalWidth > 1000 ? img.naturalWidth / 1.5 : img.naturalWidth,
+        // height: img.naturalHeight > 1000 ? img.naturalHeight / 1.5 : img.naturalHeight
+        // width: img.naturalWidth,
+        // height: img.naturalHeight
+      })
+    }
+  };
 }
 
 // 尺寸初始化
