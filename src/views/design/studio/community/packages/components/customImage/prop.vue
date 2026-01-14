@@ -12,10 +12,20 @@
           <visui-input v-model="state.style.device.name" @change="handleStateChange" />
         </visui-item>
         <visui-item label="设备位置">
-          <visui-select v-model="state.style.device.region" allow-create class="full-width" filterable
-            @change="handleStateChange">
-            <visui-option v-for="item in region_list" :key="item.value" :label="item.label" :value="item.value" />
-          </visui-select>
+          <div style="display: flex;">
+            <visui-select v-model="state.style.device.region" allow-create class="full-width" filterable
+              @change="handleStateChange">
+              <visui-option v-for="item in region_list" :key="item.value" :label="item.label" :value="item.value" />
+            </visui-select>
+            <div style="margin-left: 5px;">
+              <el-tooltip class="box-item" effect="light" content="输入可自定义添加房间" placement="top-start">
+                <el-icon size="26">
+                  <CirclePlus />
+                </el-icon>
+              </el-tooltip>
+
+            </div>
+          </div>
         </visui-item>
         <visui-item label="设备数量">
           <visui-input-number suffix="台" v-model="state.style.device.num" @change="handleStateChange" />
@@ -23,9 +33,13 @@
         <visui-item label="设备价格">
           <visui-input-number suffix="元" v-model="state.style.device.price" @change="handleStateChange" />
         </visui-item>
-        <visui-item label="设备折扣价">
-          <visui-input-number suffix="元" v-model="state.style.device.discountPrice" @change="handleStateChange" />
+        <visui-item label="成本价格">
+          <visui-input-number suffix="元" disabled v-model="state.style.device.costPrice" :min="0"
+            @change="handleStateChange" />
         </visui-item>
+        <!-- <visui-item label="设备折扣">
+          <visui-input-number suffix="%" v-model="state.style.device.discountPrice" @change="handleStateChange" />
+        </visui-item> -->
         <visui-item label="备注">
           <visui-input v-model="state.style.device.remark" type="textarea" @change="handleStateChange" />
         </visui-item>
@@ -283,7 +297,6 @@ function onSiblingEvent(payload) {
   }, 250)
   handleStateChange()
   // console.log(state.value.style.device.name, 2020202);
-
 }
 setTimeout(() => {
   isShow.value = true
@@ -303,7 +316,8 @@ const handleOpenImg = () => {
         handleImageChange(url)
       }
     },
-    source: componentName
+    source: componentName,
+    isProductImg: true
   })
 }
 

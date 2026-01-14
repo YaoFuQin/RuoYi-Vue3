@@ -88,6 +88,8 @@ const selectedFile = ref(null)
 const baseUrl = import.meta.env.VITE_APP_BASE_API
 const imageBaseUrl = import.meta.env.VITE_APP_VIEW_IMG_URL
 
+const isProductImg = ref('')
+
 
 const emit = defineEmits(['finish'])
 const state = reactive({
@@ -112,7 +114,9 @@ const state = reactive({
   treeState: null as any
 })
 
-const handleOpenDialog = (callback: Function) => {
+const handleOpenDialog = (callback: Function, source: any) => {
+  console.log(source, '111122');
+  isProductImg.value = source
   state.callbackFun = callback
   state.visible = true
   initGetClassData()
@@ -315,7 +319,7 @@ const uploadImage = async (file) => {
     // formData.append('timestamp', Date.now());
 
     // 发送请求
-    const response = await fetch(baseUrl + '/common/upload', {
+    const response = await fetch(baseUrl + (isProductImg.value == 'datavisSettingBarBackground' ? '/common/uploadNoCompress' : '/common/upload'), {
       method: 'POST',
       headers: {
         // ...this.options.headers
