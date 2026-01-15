@@ -25,8 +25,7 @@
                   @keyup.enter="handleQuery" />
               </el-form-item>
               <el-form-item label="所属品牌" prop="brand">
-                <el-select v-model="queryParams.brand" placeholder="请选择" style="width: 240px" filterable allow-create
-                  default-first-option>
+                <el-select v-model="queryParams.brand" placeholder="请选择" style="width: 240px" filterable>
                   <el-option v-for="dict in sys_brand_name" :key="dict.value" :label="dict.label"
                     :value="dict.value"></el-option>
                 </el-select>
@@ -77,7 +76,7 @@
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
                     <el-image style="width: 100px; height: 100px;border-radius: 10px;"
-                      :src="baseUrl + scope.row.iconUrl" @click="viewImg(baseUrl + scope.row.iconUrl)"> </el-image>
+                      :src="baseUrl + scope.row.iconUrl" :preview-src-list="[baseUrl + scope.row.iconUrl]"> </el-image>
                   </div>
                 </template>
               </el-table-column>
@@ -142,8 +141,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="所属品牌" prop="brand">
-              <el-select v-model="form.brand" placeholder="所属品牌" filterable allow-create default-first-option clearable
-                style="width: 240px">
+              <el-select v-model="form.brand" placeholder="所属品牌" filterable clearable style="width: 240px">
                 <el-option v-for="dict in sys_brand_name" :key="dict.value" :label="dict.label" :value="dict.value" />
               </el-select>
             </el-form-item>
@@ -197,9 +195,6 @@
         </div>
       </template>
     </el-dialog>
-    <el-dialog v-model="dialogVisible" title="预览" width="800px" height="500px" append-to-body>
-      <img :src="dialogImageUrl" style="display: block; max-width: 100%; margin: 0 auto" />
-    </el-dialog>
   </div>
 </template>
 
@@ -228,8 +223,6 @@ const single = ref(true)
 const multiple = ref(true)
 const total = ref(0)
 const title = ref("")
-const dialogVisible = ref(false)
-const dialogImageUrl = ref('')
 const dateRange = ref([])
 const categoryName = ref("")
 const categoryOptions = ref([])
@@ -305,11 +298,6 @@ const filterNode = (value, data) => {
 watch(categoryName, val => {
   proxy.$refs["deptTreeRef"].filter(val)
 })
-
-function viewImg (url) {
-  dialogImageUrl.value = url
-  dialogVisible.value = true
-}
 
 /** 查询产品列表 */
 function getList () {

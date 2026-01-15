@@ -43,7 +43,6 @@ import datavisApi from '@/api/datavisApi.ts'
 import { pick, omit } from 'lodash-es'
 
 import emitter from '@/utils/eventBus'
-import Cookies from "js-cookie"
 
 
 const componentName = 'datavisFrame'
@@ -87,9 +86,7 @@ const pageInfo = computed(() => {
 })
 
 // 操作
-const handleCommand = (type: pageOperationTypes, data: any, source?: any, isProductImg?: any) => {
-  console.log(type, data, source, 222);
-
+const handleCommand = (type: pageOperationTypes, data: any, source?: any) => {
   switch (type) {
     case pageOperationTypes.save:
       handleSaveData()
@@ -127,7 +124,7 @@ const handleCommand = (type: pageOperationTypes, data: any, source?: any, isProd
       break
     case pageOperationTypes.imagePicker:
       console.log(9)
-      handleImagePickerOpen(data, source)
+      handleImagePickerOpen(data)
       break
     case pageOperationTypes.fileUpload:
       console.log(10)
@@ -158,8 +155,8 @@ const handleFileUpload = async ({ formData, callback }: any) => {
   callback({ urls })
 }
 
-const handleImagePickerOpen = ({ callback }: any, source) => {
-  imagePickerDialogRef.value.handleOpenDialog(callback, source)
+const handleImagePickerOpen = ({ callback }: any) => {
+  imagePickerDialogRef.value.handleOpenDialog(callback)
 }
 
 const handleFinishImagePickerDialog = (e: any) => {
@@ -503,101 +500,7 @@ const initGetScreenData = async () => {
             "uid": 'xxx001',
             'pageId': data.pageList[0].id,
             "type": "screen",
-            "objects": [
-              // {
-              //   "id": "61cyRDYT",
-              //   "name": "设备",
-              //   "type": "object",
-              //   "component": {
-              //     "name": "customWidgetImage",
-              //     "title": "设备"
-              //   },
-              //   "stateIndex": 0,
-              //   "states": [
-              //     {
-              //       "src": "http://192.168.0.103:8080/profile/upload/2025/11/17/temp_1763369775984_20251117165615A106.png",
-              //       "style": {
-              //         "backgroundColor": "rgba(0,0,0,0)",
-              //         "borderWidth": 3,
-              //         "borderStyle": "solid",
-              //         "borderColor": "#5182D5",
-              //         "objectFit": "fill",
-              //         "device": {
-              //           name: '服务费',
-              //           iconUrl: '/profile/upload/2025/12/19/微信图片_20251219124420_260_750_20251219125415A003.png',
-              //           categoryName: '其他项',
-              //           brand: '--',
-              //           price: 0,
-              //           projectsId: Number(route.query.id),
-              //           categoryId: 2043,// 目前写死的
-              //           discountPrice: 0,
-              //           num: 1,
-              //           unit: '元',
-              //           introduction: '服务费',
-              //           region: '服务费'
-              //         }
-              //       },
-              //       "name": "默认状态"
-              //     }
-              //   ],
-              //   "x": 11458.7856035481228,
-              //   "y": 11306.78,
-              //   "w": 50,
-              //   "h": 50,
-              //   "angle": 0,
-              //   "locked": false,
-              //   "visible": true,
-              //   "events": {
-              //     "enable": false
-              //   },
-              //   "requests": {
-              //     "type": "static",
-              //     "url": "",
-              //     "method": "GET",
-              //     "params": "",
-              //     "header": "",
-              //     "internal": 0,
-              //     "dataFilter": ""
-              //   },
-              //   "opacity": 1,
-              //   "rotate": false,
-              //   "duration": 3,
-              //   "reverse": false,
-              //   "skewAngle": "rotating",
-              //   "filter": {
-              //     "enable": false,
-              //     "hueRotate": {
-              //       "enable": false,
-              //       "value": 0
-              //     },
-              //     "contrast": {
-              //       "enable": false,
-              //       "value": 100
-              //     },
-              //     "saturate": {
-              //       "enable": false,
-              //       "value": 100
-              //     },
-              //     "brightness": {
-              //       "enable": false,
-              //       "value": 100
-              //     },
-              //     "grayscale": {
-              //       "enable": false,
-              //       "value": 0
-              //     }
-              //   },
-              //   "dataFieldMap": [
-              //     {
-              //       "fieldName": "src",
-              //       "fieldAlias": "",
-              //       "fieldDesc": "文本",
-              //       "dataType": "string"
-              //     }
-              //   ],
-              //   "data": []
-              // }
-            ]
+            "objects": []
           }
         ],
         "backend": [
@@ -743,42 +646,29 @@ const processImage = async (image, margin = 200, color = 'white') => {
 
 // 保存图纸
 const handleSaveData = async () => {
-  console.log('kaishi');
   let saveSuccess = false // 保存是否成功
   state.loadingText = '正在保存中...'
   const { pageData, image } = await datavisEditorRef.value.exposeGetSaveData()
   // const fileFullName = route.params.id
   const fileFullName = queryData.id
   const content = JSON.stringify(pageData)
-  console.log('jiesu');
   // console.log(content);
-  // let productSelections = extractDevicesFromScreenConfig(JSON.parse(content))
+  let productSelections = extractDevicesFromScreenConfig(JSON.parse(content))
 
-  // processImage(image)
+  processImage(image)
 
-  // setTimeout(() => {
-  updateProjectManagement({
-    id: route.query.id,
-    jsonData: content,
-    // productSelections,
-    // image: imgurl.value
-  }).then(response => {
-    useMessage.success('保存成功')
-    saveSuccess = true
-    graphString = JSON.stringify(omit(pageData, ['info'])) // 更新全局变量图纸数据
-    const isDetails = Cookies.get("isDetails")
-    if (isDetails === 'true') {
-      // const newWindow = window.open();
-      // newWindow.location.href = `/projectManagement_detials?id=${route.query.id}`;
-      router.push({ path: '/projectManagement_detials', query: { id: route.query.id } })
-      Cookies.remove("isDetails")
-      // getShare({ projectsId: route.query.id }).then(response => {
-      //   share_url.value = 'https://yilaxcx.openhola.com?shareCode=' + response.data
-      //   dialog_share.value = true
-      // })
-    }
-  })
-  // }, 300)
+  setTimeout(() => {
+    updateProjectManagement({
+      id: route.query.id,
+      jsonData: content,
+      productSelections,
+      image: imgurl.value
+    }).then(response => {
+      useMessage.success('保存成功')
+      saveSuccess = true
+      graphString = JSON.stringify(omit(pageData, ['info'])) // 更新全局变量图纸数据
+    })
+  }, 500)
 
   // const jsonFile = new File([content], `${fileFullName}.json`, {
   //   type: 'text/json'
@@ -852,7 +742,6 @@ onMounted(() => {
     // 1. 选中所有匹配的元素
     const elements = document.querySelectorAll('.page-bar_board_item');
     const elements1 = document.querySelectorAll('.visui-item');
-
     // 2. 遍历并删除每个元素
     elements.forEach((el: any, index) => {
       if (index == 0 || index == elements.length - 1) {

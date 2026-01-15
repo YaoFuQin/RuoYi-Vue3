@@ -26,8 +26,8 @@
                 <div class="pull-right">{{ state.user.email }}</div>
               </li>
               <li class="list-group-item">
-                <svg-icon icon-class="tree" />所属企业
-                <div class="pull-right" v-if="state.company.id">{{ state.company.name }}
+                <svg-icon icon-class="tree" />所属部门
+                <div class="pull-right" v-if="state.user.dept">{{ state.user.dept.deptName }} / {{ state.postGroup }}
                 </div>
               </li>
               <li class="list-group-item">
@@ -53,9 +53,6 @@
             <el-tab-pane label="基本资料" name="userinfo">
               <userInfo :user="state.user" />
             </el-tab-pane>
-            <el-tab-pane label="企业认证" name="enterpriseCertification">
-              <enterpriseCertification :company="state.company" />
-            </el-tab-pane>
             <el-tab-pane label="修改密码" name="resetPwd">
               <resetPwd />
             </el-tab-pane>
@@ -69,7 +66,6 @@
 <script setup name="Profile">
 import userAvatar from "./userAvatar"
 import userInfo from "./userInfo"
-import enterpriseCertification from "./enterpriseCertification"
 import resetPwd from "./resetPwd"
 import { getUserProfile } from "@/api/system/user"
 
@@ -77,7 +73,6 @@ const route = useRoute()
 const selectedTab = ref("userinfo")
 const state = reactive({
   user: {},
-  company: {},
   roleGroup: {},
   postGroup: {}
 })
@@ -85,9 +80,6 @@ const state = reactive({
 function getUser () {
   getUserProfile().then(response => {
     state.user = response.data
-    if (response.company) {
-      state.company = response.company
-    }
     state.roleGroup = response.roleGroup
     state.postGroup = response.postGroup
   })

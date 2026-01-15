@@ -276,6 +276,7 @@ function handleExport () {
 /** 导出按钮操作 */
 function toDetails (row) {
   Cookies.set("projectId", row.id, { expires: 30 })
+
   router.push({ path: '/projectDrag', query: { id: row.id } })
 }
 

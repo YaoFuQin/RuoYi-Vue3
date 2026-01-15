@@ -1,26 +1,23 @@
 <template>
   <div id="tags-view-container" class="tags-view-container">
     <scroll-pane ref="scrollPaneRef" class="tags-view-wrapper" @scroll="handleScroll">
-      <router-link v-for="tag in visitedViews" :key="tag.path" :data-path="tag.path"
-        :class="{ 'active': isActive(tag) }" :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
-        class="tags-view-item" :style="activeStyle(tag)" @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
-        @contextmenu.prevent="openMenu(tag, $event)">
-        {{ tag.title }}
-        <span v-if="!isAffix(tag)" @click.prevent.stop="closeSelectedTag(tag)">
-          <close class="el-icon-close" style="width: 1em; height: 1em;vertical-align: middle;" />
-        </span>
-      </router-link>
-      <!-- <router-link v-for="tag in visitedViews" :key="tag.path" :data-path="tag.path"
+      <router-link
+        v-for="tag in visitedViews"
+        :key="tag.path"
+        :data-path="tag.path"
         :class="{ 'active': isActive(tag), 'has-icon': tagsIcon }"
-        :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }" class="tags-view-item"
-        :style="activeStyle(tag)" @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
-        @contextmenu.prevent="openMenu(tag, $event)">
+        :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
+        class="tags-view-item"
+        :style="activeStyle(tag)"
+        @click.middle="!isAffix(tag) ? closeSelectedTag(tag) : ''"
+        @contextmenu.prevent="openMenu(tag, $event)"
+      >
         <svg-icon v-if="tagsIcon && tag.meta && tag.meta.icon && tag.meta.icon !== '#'" :icon-class="tag.meta.icon" />
         {{ tag.title }}
         <span v-if="!isAffix(tag)" @click.prevent.stop="closeSelectedTag(tag)">
           <close class="el-icon-close" style="width: 1em; height: 1em;vertical-align: middle;" />
         </span>
-      </router-link> -->
+      </router-link>
     </scroll-pane>
     <ul v-show="visible" :style="{ left: left + 'px', top: top + 'px' }" class="contextmenu">
       <li @click="refreshSelectedTag(selectedTag)">
@@ -86,11 +83,11 @@ onMounted(() => {
   addTags()
 })
 
-function isActive (r) {
+function isActive(r) {
   return r.path === route.path
 }
 
-function activeStyle (tag) {
+function activeStyle(tag) {
   if (!isActive(tag)) return {}
   return {
     "background-color": theme.value,
@@ -98,11 +95,11 @@ function activeStyle (tag) {
   }
 }
 
-function isAffix (tag) {
+function isAffix(tag) {
   return tag.meta && tag.meta.affix
 }
 
-function isFirstView () {
+function isFirstView() {
   try {
     return selectedTag.value.fullPath === '/index' || selectedTag.value.fullPath === visitedViews.value[1].fullPath
   } catch (err) {
@@ -110,7 +107,7 @@ function isFirstView () {
   }
 }
 
-function isLastView () {
+function isLastView() {
   try {
     return selectedTag.value.fullPath === visitedViews.value[visitedViews.value.length - 1].fullPath
   } catch (err) {
@@ -118,7 +115,7 @@ function isLastView () {
   }
 }
 
-function filterAffixTags (routes, basePath = '') {
+function filterAffixTags(routes, basePath = '') {
   let tags = []
   routes.forEach(route => {
     if (route.meta && route.meta.affix) {
@@ -140,25 +137,25 @@ function filterAffixTags (routes, basePath = '') {
   return tags
 }
 
-function initTags () {
+function initTags() {
   const res = filterAffixTags(routes.value)
   affixTags.value = res
   for (const tag of res) {
     // Must have tag name
     if (tag.name) {
-      useTagsViewStore().addVisitedView(tag)
+       useTagsViewStore().addVisitedView(tag)
     }
   }
 }
 
-function addTags () {
+function addTags() {
   const { name } = route
   if (name) {
     useTagsViewStore().addView(route)
   }
 }
 
-function moveToCurrentTag () {
+function moveToCurrentTag() {
   nextTick(() => {
     for (const r of visitedViews.value) {
       if (r.path === route.path) {
@@ -172,14 +169,14 @@ function moveToCurrentTag () {
   })
 }
 
-function refreshSelectedTag (view) {
+function refreshSelectedTag(view) {
   proxy.$tab.refreshPage(view)
   if (route.meta.link) {
     useTagsViewStore().delIframeView(route)
   }
 }
 
-function closeSelectedTag (view) {
+function closeSelectedTag(view) {
   proxy.$tab.closePage(view).then(({ visitedViews }) => {
     if (isActive(view)) {
       toLastView(visitedViews, view)
@@ -187,7 +184,7 @@ function closeSelectedTag (view) {
   })
 }
 
-function closeRightTags () {
+function closeRightTags() {
   proxy.$tab.closeRightPage(selectedTag.value).then(visitedViews => {
     if (!visitedViews.find(i => i.fullPath === route.fullPath)) {
       toLastView(visitedViews)
@@ -195,7 +192,7 @@ function closeRightTags () {
   })
 }
 
-function closeLeftTags () {
+function closeLeftTags() {
   proxy.$tab.closeLeftPage(selectedTag.value).then(visitedViews => {
     if (!visitedViews.find(i => i.fullPath === route.fullPath)) {
       toLastView(visitedViews)
@@ -203,14 +200,14 @@ function closeLeftTags () {
   })
 }
 
-function closeOthersTags () {
+function closeOthersTags() {
   router.push(selectedTag.value).catch(() => { })
   proxy.$tab.closeOtherPage(selectedTag.value).then(() => {
     moveToCurrentTag()
   })
 }
 
-function closeAllTags (view) {
+function closeAllTags(view) {
   proxy.$tab.closeAllPage().then(({ visitedViews }) => {
     if (affixTags.value.some(tag => tag.path === route.path)) {
       return
@@ -219,7 +216,7 @@ function closeAllTags (view) {
   })
 }
 
-function toLastView (visitedViews, view) {
+function toLastView(visitedViews, view) {
   const latestView = visitedViews.slice(-1)[0]
   if (latestView) {
     router.push(latestView.fullPath)
@@ -235,7 +232,7 @@ function toLastView (visitedViews, view) {
   }
 }
 
-function openMenu (tag, e) {
+function openMenu(tag, e) {
   const menuMinWidth = 105
   const offsetLeft = proxy.$el.getBoundingClientRect().left // container margin left
   const offsetWidth = proxy.$el.offsetWidth // container width
@@ -253,11 +250,11 @@ function openMenu (tag, e) {
   selectedTag.value = tag
 }
 
-function closeMenu () {
+function closeMenu() {
   visible.value = false
 }
 
-function handleScroll () {
+function handleScroll() {
   closeMenu()
 }
 </script>
