@@ -29,24 +29,13 @@
 
             <el-row :gutter="10" class="mb8">
               <el-col :span="1.5">
-                <el-button type="primary" plain icon="Plus" @click="handleAdd"
-                  v-hasPermi="['system:user:add']">新增</el-button>
+                <el-button type="primary" plain icon="Plus" @click="handleAdd">新增</el-button>
               </el-col>
               <el-col :span="1.5">
-                <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate"
-                  v-hasPermi="['system:user:edit']">修改</el-button>
+                <el-button type="success" plain icon="Edit" :disabled="single" @click="handleUpdate">修改</el-button>
               </el-col>
               <el-col :span="1.5">
-                <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
-                  v-hasPermi="['system:user:remove']">删除</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="info" plain icon="Upload" @click="handleImport"
-                  v-hasPermi="['system:user:import']">导入</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="warning" plain icon="Download" @click="handleExport"
-                  v-hasPermi="['system:user:export']">导出</el-button>
+                <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete">删除</el-button>
               </el-col>
               <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
             </el-row>
@@ -57,8 +46,8 @@
                 v-if="columns.userName.visible" :show-overflow-tooltip="true" />
               <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName"
                 v-if="columns.nickName.visible" :show-overflow-tooltip="true" />
-              <el-table-column label="所属企业" align="center" key="companyName" prop="companyName"
-                v-if="columns.companyName.visible" width="120" />
+              <!-- <el-table-column label="所属企业" align="center" key="companyName" prop="companyName"
+                v-if="columns.companyName.visible" width="120" /> -->
               <!-- <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber"
                 v-if="columns.phonenumber.visible" width="120" /> -->
               <el-table-column label="状态" align="center" key="status" v-if="columns.status.visible">
@@ -76,12 +65,10 @@
               <el-table-column label="操作" align="center" width="150" class-name="small-padding fixed-width">
                 <template #default="scope">
                   <el-tooltip content="修改" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"
-                      v-hasPermi="['system:user:edit']"></el-button>
+                    <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)"></el-button>
                   </el-tooltip>
                   <el-tooltip content="删除" placement="top" v-if="scope.row.userId !== 1">
-                    <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"
-                      v-hasPermi="['system:user:remove']"></el-button>
+                    <el-button link type="primary" icon="Delete" @click="handleDelete(scope.row)"></el-button>
                   </el-tooltip>
                   <el-tooltip content="重置密码" placement="top" v-if="scope.row.userId !== 1">
                     <el-button link type="primary" icon="Key" @click="handleResetPwd(scope.row)"
@@ -89,7 +76,7 @@
                   </el-tooltip>
                   <!-- <el-tooltip content="分配角色" placement="top" v-if="scope.row.userId !== 1">
                     <el-button link type="primary" icon="CircleCheck" @click="handleAuthRole(scope.row)"
-                      v-hasPermi="['system:user:edit']"></el-button>
+                     ></el-button>
                   </el-tooltip> -->
                 </template>
               </el-table-column>
@@ -128,16 +115,6 @@
                 <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{ dict.label
                 }}</el-radio>
               </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择">
-                <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId"
-                  :disabled="item.status == 1"></el-option>
-              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -233,7 +210,7 @@ const upload = reactive({
 const columns = ref({
   userName: { label: '用户账号', visible: true },
   nickName: { label: '用户昵称', visible: true },
-  companyName: { label: '所属企业', visible: true },
+  // companyName: { label: '所属企业', visible: true },
   // phonenumber: { label: '手机号码', visible: true },
   status: { label: '状态', visible: true },
   createTime: { label: '创建时间', visible: true }

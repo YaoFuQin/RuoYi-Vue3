@@ -34,18 +34,27 @@
     </div>
 
     <div class="toolbar-right">
-      <topAction @click="shareFun" title="分享">
-        <visui-icon name="vis-yulan" :size="18"></visui-icon>
+      <topAction @click="shareFun" title="编辑报价单">
+        <!-- <visui-icon name="vis-Share" :size="18"></visui-icon> -->
+        <el-icon>
+          <EditPen />
+        </el-icon>
       </topAction>
-      <topAction @click="bitmap" title="点位图">
-        <visui-icon name="vis-yulan" :size="18"></visui-icon>
+      <!-- <topAction @click="bitmap" title="下载点位图" style="margin-right: 10px;">
+        <el-icon>
+          <Download />
+        </el-icon>
+      </topAction> -->
+      <!-- <topAction @click="exportByCategory" title="集成报价表" style="margin-right: 10px;">
+        <el-icon>
+          <Download />
+        </el-icon>
       </topAction>
-      <topAction @click="exportByCategory" title="分类报价单">
-        <visui-icon name="vis-yulan" :size="18"></visui-icon>
-      </topAction>
-      <topAction @click="exportFun" title="报价单">
-        <visui-icon name="vis-yulan" :size="18"></visui-icon>
-      </topAction>
+      <topAction @click="exportFun" title="区域报价表">
+        <el-icon>
+          <Download />
+        </el-icon>
+      </topAction> -->
       <topAction @click="handleExternal(pageOperationTypes.save)" title="保存项目">
         <visui-icon name="vis-baocun" :size="18"></visui-icon>
       </topAction>
@@ -147,6 +156,7 @@ import { getShare } from "@/api/projectManagement"
 import topAction from './component/action.vue'
 import emitter from '../../../../../../utils/eventBus'
 
+import Cookies from "js-cookie"
 
 import QrcodeVue from 'qrcode.vue'
 import html2canvas from 'html2canvas';
@@ -190,8 +200,8 @@ const data = reactive({
   }
 })
 
-import { useRoute } from 'vue-router'
-
+import { useRoute, useRouter } from 'vue-router'
+const router = useRouter()
 const route = useRoute()
 
 const activeName = ref('first')
@@ -393,13 +403,8 @@ const handleExternal = (event: string) => {
 }
 
 const shareFun = () => {
+  Cookies.set("isDetails", 'true', { expires: 30 })
   editor.fire(eventTypes.pageOperation, { type: pageOperationTypes.save, source: componentName })
-  setTimeout(() => {
-    getShare({ projectsId: route.query.id }).then(response => {
-      share_url.value = 'https://yilaxcx.openhola.com?shareCode=' + response.data
-      dialog_share.value = true
-    })
-  }, 1500)
 }
 
 
@@ -460,5 +465,9 @@ onBeforeUnmount(() => {
   font-size: 14px;
   color: #666;
   text-align: center;
+}
+
+::v-deep .vis-icon-outline {
+  /* background: transparent !important; */
 }
 </style>
