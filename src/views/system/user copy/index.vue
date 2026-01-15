@@ -40,14 +40,6 @@
                 <el-button type="danger" plain icon="Delete" :disabled="multiple" @click="handleDelete"
                   v-hasPermi="['system:user:remove']">删除</el-button>
               </el-col>
-              <el-col :span="1.5">
-                <el-button type="info" plain icon="Upload" @click="handleImport"
-                  v-hasPermi="['system:user:import']">导入</el-button>
-              </el-col>
-              <el-col :span="1.5">
-                <el-button type="warning" plain icon="Download" @click="handleExport"
-                  v-hasPermi="['system:user:export']">导出</el-button>
-              </el-col>
               <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
             </el-row>
 
@@ -57,8 +49,8 @@
                 v-if="columns.userName.visible" :show-overflow-tooltip="true" />
               <el-table-column label="用户昵称" align="center" key="nickName" prop="nickName"
                 v-if="columns.nickName.visible" :show-overflow-tooltip="true" />
-              <el-table-column label="所属企业" align="center" key="companyName" prop="companyName"
-                v-if="columns.companyName.visible" width="120" />
+              <!-- <el-table-column label="所属企业" align="center" key="companyName" prop="companyName"
+                v-if="columns.companyName.visible" width="120" /> -->
               <!-- <el-table-column label="手机号码" align="center" key="phonenumber" prop="phonenumber"
                 v-if="columns.phonenumber.visible" width="120" /> -->
               <el-table-column label="状态" align="center" key="status" v-if="columns.status.visible">
@@ -107,7 +99,7 @@
         <el-row>
           <el-col :span="12">
             <el-form-item v-if="form.userId == undefined" label="用户账号" prop="userName">
-              <el-input v-model="form.userName" placeholder="请输入用户账号" maxlength="11" />
+              <el-input v-model="form.userName" placeholder="请输入用户账号" maxlength="30" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -128,16 +120,6 @@
                 <el-radio v-for="dict in sys_normal_disable" :key="dict.value" :value="dict.value">{{ dict.label
                 }}</el-radio>
               </el-radio-group>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="角色">
-              <el-select v-model="form.roleIds" multiple placeholder="请选择">
-                <el-option v-for="item in roleOptions" :key="item.roleId" :label="item.roleName" :value="item.roleId"
-                  :disabled="item.status == 1"></el-option>
-              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
@@ -233,7 +215,7 @@ const upload = reactive({
 const columns = ref({
   userName: { label: '用户账号', visible: true },
   nickName: { label: '用户昵称', visible: true },
-  companyName: { label: '所属企业', visible: true },
+  // companyName: { label: '所属企业', visible: true },
   // phonenumber: { label: '手机号码', visible: true },
   status: { label: '状态', visible: true },
   createTime: { label: '创建时间', visible: true }
