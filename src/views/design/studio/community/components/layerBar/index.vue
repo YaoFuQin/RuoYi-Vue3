@@ -72,7 +72,6 @@ defineOptions({ name: 'datavisLayerBar' })
 const baseUrl = ref(import.meta.env.VITE_APP_VIEW_IMG_URL) // 图片预览地址
 const productList = ref([])
 
-
 const data = reactive({
   queryParams: {
     pageNum: 1,
@@ -116,16 +115,12 @@ const handleScroll = () => {
   }
 };
 
-
 /** 查询产品列表 */
 function getList(type) {
   // 公司产品
   companyProducts_list(queryParams.value).then(res => {
     if (queryParams.value.pageNum * queryParams.value.pageSize >= res.total) {
       hasMore.value = false;
-    }
-    if (type == 'search') {
-      productList.value = []
     }
     productList.value.push(...res.rows);
   })
@@ -244,7 +239,7 @@ watch(
 
 const handleSearch = debounce(val => {
   queryParams.value.pageNum = 1
-  getList('search')
+  getList()
   // if (val) {
   //   function filterData(data: any, keyword: any) {
   //     function recursiveFilter(nodes: any) {

@@ -3,8 +3,6 @@ import { ElMessageBox } from 'element-plus'
 import { login, logout, getInfo } from '@/api/login'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { isHttp, isEmpty } from '@/utils/validate'
-import Cookies from 'js-cookie'
-
 import defAva from '@/assets/images/profile.jpg'
 
 const useUserStore = defineStore('user', {
@@ -57,15 +55,6 @@ const useUserStore = defineStore('user', {
                         this.name = user.userName
                         this.nickName = user.nickName
                         this.avatar = avatar
-                        Cookies.set('isCompany', res.user.companyId ? true : false)
-                        /* 是否公司认证 */
-                        // if (!res.user.companyId) {
-                        //     ElMessageBox.confirm('您还未企业认证，是否前往认证？', '安全提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' })
-                        //         .then(() => {
-                        //             router.push({ name: 'Profile', params: { activeTab: 'enterpriseCertification' } })
-                        //         })
-                        //         .catch(() => {})
-                        // }
                         /* 初始密码提示 */
                         if (res.isDefaultModifyPwd) {
                             // ElMessageBox.confirm('您的密码还是初始密码，请修改密码！', '安全提示', { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' })

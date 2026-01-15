@@ -25,8 +25,7 @@
                   @keyup.enter="handleQuery" />
               </el-form-item>
               <el-form-item label="所属品牌" prop="brand">
-                <el-select v-model="queryParams.brand" placeholder="请选择" style="width: 240px" filterable allow-create
-                  default-first-option>
+                <el-select v-model="queryParams.brand" placeholder="请选择" style="width: 240px" filterable>
                   <el-option v-for="dict in sys_brand_name" :key="dict.value" :label="dict.label"
                     :value="dict.value"></el-option>
                 </el-select>
@@ -62,9 +61,6 @@
                 <el-button type="warning" plain icon="Download" @click="handleExport"
                   v-hasPermi="['productManagement:companyProducts:export']">导出</el-button>
               </el-col>
-              <el-col :span="1.5">
-                <el-button type="info" plain icon="Upload" @click="synchronizeProducts">同步产品</el-button>
-              </el-col>
               <right-toolbar v-model:showSearch="showSearch" @queryTable="getList" :columns="columns"></right-toolbar>
             </el-row>
 
@@ -75,8 +71,8 @@
               <el-table-column label="图标" align="center" key="iconUrl" v-if="columns.iconUrl.visible" width="120">
                 <template #default="scope">
                   <div style="display: flex; align-items: center">
-                    <el-image style="width: 100px; height: 100px;" @click="viewImg(baseUrl + scope.row.iconUrl)"
-                      :src="baseUrl + scope.row.iconUrl"> </el-image>
+                    <el-image style="width: 100px; height: 100px;border-radius: 10px;"
+                      :src="baseUrl + scope.row.iconUrl" :preview-src-list="[baseUrl + scope.row.iconUrl]"> </el-image>
                   </div>
                 </template>
               </el-table-column>
@@ -88,8 +84,6 @@
                 :show-overflow-tooltip="true" />
               <el-table-column label="价格" align="center" key="price" prop="price" width="80"
                 v-if="columns.price.visible" :show-overflow-tooltip="true" />
-              <el-table-column label="成本价格" align="center" key="costPrice" prop="costPrice" width="90"
-                v-if="columns.costPrice.visible" :show-overflow-tooltip="true" />
               <el-table-column label="介绍" align="center" key="introduction" prop="introduction"
                 v-if="columns.introduction.visible" :show-overflow-tooltip="true" />
               <el-table-column label="创建时间" align="center" prop="createTime" v-if="columns.createTime.visible"
@@ -117,9 +111,7 @@
         </pane>
       </splitpanes>
     </el-row>
-    <el-dialog v-model="dialogVisible" title="预览" width="800px" height="500px" append-to-body>
-      <img :src="dialogImageUrl" style="display: block; max-width: 100%; margin: 0 auto" />
-    </el-dialog>
+
     <!-- 添加或修改产品配置对话框 -->
     <el-dialog :title="title" v-model="open" width="600px" :append-to-body="true">
       <el-form :model="form" :rules="rules" ref="userRef" label-width="80px">
@@ -147,22 +139,16 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="所属品牌" prop="brand">
-              <el-select v-model="form.brand" placeholder="所属品牌" filterable allow-create default-first-option clearable
-                style="width: 240px">
+              <el-select v-model="form.brand" placeholder="所属品牌" filterable clearable style="width: 240px">
                 <el-option v-for="dict in sys_brand_name" :key="dict.value" :label="dict.label" :value="dict.value" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
-          <el-col :span="12">
+          <el-col :span="24">
             <el-form-item label="产品价格" prop="price">
               <el-input v-model="form.price" placeholder="请输入价格" type="number" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="成本价格" prop="costPrice">
-              <el-input v-model="form.costPrice" placeholder="请输入成本价格" type="number" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -217,17 +203,6 @@
         </div>
       </template>
     </el-dialog>
-
-    <!-- 邀请码同步产品对话框 -->
-    <!-- <el-dialog title="请填写邀请码同步产品" v-model="synchronizeProductsOpen" width="400px" top="30vh">
-      <el-input v-model="invitationCode" placeholder="邀请码" maxlength="30" />
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button type="primary" @click="submitForm">确 定</el-button>
-          <el-button @click="cancel">取 消</el-button>
-        </div>
-      </template>
-    </el-dialog> -->
   </div>
 </template>
 
@@ -236,7 +211,7 @@ import { getToken } from "@/utils/auth"
 import useAppStore from '@/store/modules/app'
 
 import { listCategory } from "@/api/system/category"
-import { companyProducts_list, addCompanyProducts, updateCompanyProducts, roleCompanyProducts, delCompanyProducts, companyProducts_verify } from "@/api/productManagement"
+import { companyProducts_list, addCompanyProducts, updateCompanyProducts, roleCompanyProducts, delCompanyProducts } from "@/api/productManagement"
 
 import { changeUserStatus, listUser, resetUserPwd, delUser, getUser, updateUser, addUser, deptTreeSelect } from "@/api/system/user"
 import { Splitpanes, Pane } from "splitpanes"
@@ -246,18 +221,14 @@ const router = useRouter()
 const appStore = useAppStore()
 const { proxy } = getCurrentInstance()
 const { sys_brand_name } = proxy.useDict("sys_brand_name")
-import { ElMessageBox } from 'element-plus'
+
 const productList = ref([])
 const open = ref(false)
-const synchronizeProductsOpen = ref(false)
-const invitationCode = ref('')
 const loading = ref(true)
 const showSearch = ref(true)
 const ids = ref([])
 const single = ref(true)
 const multiple = ref(true)
-const dialogVisible = ref(false)
-const dialogImageUrl = ref('')
 const total = ref(0)
 const title = ref("")
 const dateRange = ref([])
@@ -288,7 +259,6 @@ const columns = ref({
   iconUrl: { label: '图标', visible: true },
   categoryName: { label: '所属品类', visible: true },
   brand: { label: '品牌名称', visible: true },
-  costPrice: { label: '成本价格', visible: true },
   price: { label: '产品价格', visible: true },
   unit: { label: '单位', visible: true },
   introduction: { label: '介绍', visible: true },
@@ -324,9 +294,6 @@ const data = reactive({
     ],
     price: [
       { required: true, message: "请填写产品价格", trigger: "blur" }
-    ],
-    costPrice: [
-      { required: true, message: "请填写成本价格", trigger: "blur" }
     ]
   }
 })
@@ -353,10 +320,7 @@ function getList () {
     total.value = res.total
   })
 }
-function viewImg (url) {
-  dialogImageUrl.value = url
-  dialogVisible.value = true
-}
+
 /** 查询部门下拉树结构 */
 function getDeptTree () {
   listCategory().then(response => {
@@ -531,25 +495,7 @@ function cancel () {
   open.value = false
   reset()
 }
-function synchronizeProducts () {
-  ElMessageBox.prompt('', '请填写邀请码同步产品', {
-    confirmButtonText: '确定',
-    cancelButtonText: '取消',
-    inputPattern: /^\S+$/,
-    inputErrorMessage: '请输入邀请码',
-  })
-    .then(({ value }) => {
-      companyProducts_verify({ invitationCode: value }).then(response => {
-        resetQuery()
-        proxy.$modal.msgSuccess("同步成功")
 
-      })
-    })
-    .catch((err) => {
-      console.log(err);
-
-    })
-}
 /** 新增按钮操作 */
 function handleAdd () {
   reset()

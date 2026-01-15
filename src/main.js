@@ -9,15 +9,6 @@ import locale from 'element-plus/es/locale/lang/zh-cn'
 
 import '@/assets/styles/index.scss' // global css
 
-// ... 纯表格
-import VxeUITable from 'vxe-table'
-import 'vxe-table/lib/style.css'
-// ...
-
-// ...可选 UI
-import VxeUIBase, { log } from 'vxe-pc-ui'
-import 'vxe-pc-ui/lib/style.css'
-
 import App from './App'
 import store from './store'
 import router from './router'
@@ -77,9 +68,6 @@ app.component('ImageUpload', ImageUpload)
 app.component('ImagePreview', ImagePreview)
 app.component('RightToolbar', RightToolbar)
 app.component('Editor', Editor)
-
-app.use(VxeUIBase)
-app.use(VxeUITable)
 
 app.use(router)
 app.use(store)
