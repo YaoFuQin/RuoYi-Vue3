@@ -69,38 +69,3 @@ export function getShare(query) {
         params: query,
     })
 }
-
-// 更新项目报表
-export function editProduct(data) {
-    return request({
-        url: '/projectManagement/editProduct',
-        method: 'put',
-        data,
-    })
-}
-
-// 查看项目分享列表
-export function shareProjects_list(query) {
-    return request({
-        url: '/shareProjects/list',
-        method: 'get',
-        params: query,
-    })
-}
-
-// 查询分享项目管理详情
-export function shareProjects_detils(id) {
-    return request({
-        url: '/shareProjects/' + id,
-        method: 'get',
-    })
-}
-
-// 检验校验码
-export function checkShare(query) {
-    return request({
-        url: '/shareProjects/checkShare',
-        method: 'get',
-        params: query,
-    })
-}
